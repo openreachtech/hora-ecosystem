@@ -1,46 +1,54 @@
+import globals from 'globals'
+
 import {
-  default as openreachtechConfig,
-  coreRuleOptionHash,
+  coreConfig,
+  jsdocPluginConfig,
+  openreachtechPluginConfig,
+  stylisticPluginConfig,
 } from '@openreachtech/eslint-config'
 
+// TODO: Replace with a named export once `@openreachtech/eslint-config`
+// exposes `eslintCommentsPluginConfig` from its index.js. This deep path
+// works only because the package declares no `exports` field.
+import eslintCommentsPluginConfig from '@openreachtech/eslint-config/lib/configurations/plugins/eslint-comments.js'
+
 export default [
-  ...openreachtechConfig,
+  coreConfig,
+
+  stylisticPluginConfig,
+
+  jsdocPluginConfig,
+
+  eslintCommentsPluginConfig,
+
+  openreachtechPluginConfig,
 
   {
     ignores: [
+      '**/node_modules/**',
+
       './playground/**',
     ],
   },
 
   {
     languageOptions: {
-      globals: {
-        constructorSpy: 'readonly',
+      parserOptions: {
+        ecmaVersion: 'latest',
       },
+      sourceType: 'module',
     },
   },
 
   {
     files: [
-      'tests/**/*.js',
+      '**/*.cjs',
     ],
-    rules: {
-      'max-classes-per-file': 'off',
-    },
-  },
-
-  {
-    rules: {
-      'no-shadow': [
-        'error',
-        {
-          allow: [
-            ...coreRuleOptionHash['no-shadow'].allow,
-
-            'require',
-          ],
-        },
-      ],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
     },
   },
 ]
