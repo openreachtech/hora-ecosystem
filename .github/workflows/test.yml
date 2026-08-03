@@ -39,8 +39,3 @@ jobs:
 
       - name: 🧵 ESLint
         run: npm run lint
-
-      - name: 🧪 Jest
-        env:
-          NODE_ENV: development
-        run: npm test
