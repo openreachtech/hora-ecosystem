@@ -1,5 +1,3 @@
-import globals from 'globals'
-
 import {
   coreConfig,
   jsdocPluginConfig,
@@ -26,8 +24,6 @@ export default [
   {
     ignores: [
       '**/node_modules/**',
-
-      './playground/**',
     ],
   },
 
@@ -46,9 +42,6 @@ export default [
     ],
     languageOptions: {
       sourceType: 'commonjs',
-      globals: {
-        ...globals.node,
-      },
     },
   },
 ]
