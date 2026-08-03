@@ -28,8 +28,6 @@
   },
   "devDependencies": {
     "@openreachtech/eslint-config": "^4.4.0",
-    "@openreachtech/mentsu-rootpath": "^1.1.1",
-    "@openreachtech/renchan-env": "^1.0.4",
     "eslint": "^9.39.2"
   }
 }
