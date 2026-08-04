@@ -1,6 +1,7 @@
 #### environment
 .env
 .scratch/
+!.scratch/directory-keeper
 node_modules/
 
 #### for Windows
