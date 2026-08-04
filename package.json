@@ -65,7 +65,7 @@
     "@openreachtech/renchan-tools-coinpayments": "^1.0.0",
     "@openreachtech/renchan-tools-mailgun-client": "^0.0.1",
     "@types/jest": "^30.0.0",
-    "eslint": "^9.39.2",
+    "eslint": "^9.39.5",
     "jest": "^30.4.2"
   },
   "overrides": {
