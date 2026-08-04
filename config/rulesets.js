@@ -42,8 +42,8 @@ const RULESETS = {
     'renchan-tools-http-request-client',
     'renchan-tools-http-status-codes-handler',
     'renchan-tools-stripe-api',
-    'renchan-tutoril-duong',
-    'renchan-tutotiral-khoa',
+    'renchan-tutoril-*',
+    'renchan-tutotiral-*',
   ],
   'turned-off': [
     'mentsu-agent-*',
