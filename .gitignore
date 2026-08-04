@@ -1,5 +1,6 @@
 #### environment
 .env
+.scratch/
 node_modules/
 
 #### for Windows
