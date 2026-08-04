@@ -5,6 +5,7 @@
   "type": "module",
   "main": "index.js",
   "files": [
+    "config/",
     "lib/",
     "types/",
     "!types/env/**"
