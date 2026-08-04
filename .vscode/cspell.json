@@ -11,6 +11,14 @@
     "encryptable",
 
     "esac",
-    "softprops"
+    "softprops",
+
+    "bullmq",
+    "coinpayments",
+    "nuxt",
+    "qdrant",
+    "sequelize",
+    "tutoril",
+    "tutotiral"
   ]
 }
