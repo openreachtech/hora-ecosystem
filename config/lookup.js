@@ -45,11 +45,8 @@ const TARGET_REPOSITORIES = {
   'renchan-kafka': true,
   'renchan-replica-fragments': true,
   'renchan-sequelize': true,
-  'renchan-tools-aws-s3-client': true,
-  'renchan-tools-coinpayments': true,
   'renchan-tools-line-login-api': false, // ❌️
   'renchan-tools-line-messaging-api': false, // ❌️
-  'renchan-tools-mailgun-client': true,
   'renchan-tools-twilio': false, // ❌️
 }
 
