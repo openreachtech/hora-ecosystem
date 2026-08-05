@@ -40,6 +40,23 @@ jobs:
           fi
           echo "Filling version: $version"
 
-          gh issue edit "$NUMBER" --repo "$REPO" \
-            --title "${TITLE//vvvvvv/$version}" \
-            --body  "${BODY//vvvvvv/$version}"
+          export TITLE="${TITLE//vvvvvv/$version}"
+          export BODY="${BODY//vvvvvv/$version}"
+
+          python3 <<'PY' >/tmp/body.json
+          import json
+          import os
+
+          print(json.dumps({
+              "title": os.environ["TITLE"],
+              "body": os.environ["BODY"],
+          }))
+          PY
+
+          curl --fail --silent --show-error \
+            -X PATCH \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Content-Type: application/json" \
+            "https://api.github.com/repos/$REPO/issues/$NUMBER" \
+            --data @/tmp/body.json
