@@ -43,7 +43,16 @@ For every package marked `true` in `config/lookup.js`, create documentation unde
 
 8. Verify with `npm run lint`.
 
+9. Run `npm pack --dry-run --json` to get the exact list of files this package would publish (this repo is published publicly, so this is the actual exposure surface — broader than just `lib/`/`config/`, but that's where generated content concentrates). Scan the content of those specific files for anything that shouldn't go public:
+   - Secret-looking values (API keys, passwords, tokens, private key blocks, JWTs).
+   - Internal hostnames/IPs, or confidentiality markers (e.g. "internal only", "do not publish").
+   - Example emails/domains in copied `README.md` content that use a **real, live, non-reserved domain** instead of a safe placeholder (`example.com`, `example.org`, `example.net`, `test.com` are IANA-reserved for documentation and always safe; anything else — verify by resolving it — e.g. `dig`/`curl` — before assuming it's fake).
+   - This mainly turns up in verbatim-copied `README.md` files (step 5), since that content originates from each package's own upstream repo, not from anything authored here.
+
+   Report every finding (file, line, what was found, and — for a domain/email check — whether it resolves to something real) without editing anything. Don't silently fix or drop content; this is a report-only check, since the source material is a verbatim copy of someone else's README and any change should be a deliberate, separate decision.
+
 ## Note
 
 - Don't generate `lib/docs/` for a package that's `false` in `config/lookup.js`, or not listed there at all.
 - Out-of-scope cleanup (step 3) is automatic — `config/lookup.js` is authoritative, so no confirmation is needed to delete a `lib/docs/<package-name>/` that's no longer a target.
+- The publish-exposure check (step 9) never modifies files. Any fix (e.g. swapping a real domain for `example.com` in a copied README) is a separate, explicit decision. Only report what's concretely found — don't speculate about content you haven't actually checked.
