@@ -54,7 +54,7 @@
     "@openreachtech/mentsu-validation-rules": "^1.0.2",
     "@openreachtech/mentsu-value-inspector": "^1.1.1",
     "@openreachtech/mentsu-value-normalizer": "^1.0.1",
-    "@openreachtech/renchan": "^2.9.1",
+    "@openreachtech/renchan": "^2.9.2",
     "@openreachtech/renchan-elasticsearch": "^1.9.1",
     "@openreachtech/renchan-env": "^1.0.5",
     "@openreachtech/renchan-funnel": "^1.1.2",
