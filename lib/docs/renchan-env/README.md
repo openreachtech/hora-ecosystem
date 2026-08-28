@@ -15,14 +15,6 @@
   | Node.js | ^20.19.2 |
   | npm | ^10.5.2 |
 
-* Create a `.npmrc` file in the root directory of your project and add any necessary configurations. This might be required for installing certain npm packages.
-
-* Please add the following line to your `.npmrc` file.
-
-  ```
-  @openreachtech:registry=https://npm.pkg.github.com
-  ```
-
 * You can install `renchan-env` with the following command:
 
   ```
