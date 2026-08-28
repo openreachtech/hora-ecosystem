@@ -43,21 +43,6 @@ instead of deriving a new one.
 
 Requires Node.js 20.x (the version the CI builds against).
 
-This package is published to GitHub Packages under the `@openreachtech` scope. Before
-installing, the following two steps are required:
-
-1. Add the registry to your project's `.npmrc`:
-
-   ```
-   @openreachtech:registry=https://npm.pkg.github.com
-   ```
-
-2. Authenticate with `npm login`:
-
-   ```sh
-   npm login --registry https://npm.pkg.github.com
-   ```
-
 Then install:
 
 ```sh
