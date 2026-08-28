@@ -15,13 +15,6 @@ tree into SQL / Elasticsearch is the consuming backend's job.
 
 ## Install
 
-GitHub Packages, with a token that has `read:packages`:
-
-```ini
-# .npmrc
-@openreachtech:registry = https://npm.pkg.github.com
-```
-
 ```sh
 npm install @openreachtech/mentsu-search-condition
 ```
