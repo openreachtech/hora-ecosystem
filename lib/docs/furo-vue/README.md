@@ -10,21 +10,6 @@ Requires Node.js `^20.19.2` and npm `^10.9.0` (the versions the CI builds agains
 npm install @openreachtech/furo-vue
 ```
 
-When using GitHub Packages (the `@openreachtech` scope), the following two items are
-required:
-
-1. Add the registry to your project's `.npmrc`:
-
-   ```
-   @openreachtech:registry=https://npm.pkg.github.com
-   ```
-
-2. Authenticate with `npm login`:
-
-   ```sh
-   npm login --registry https://npm.pkg.github.com
-   ```
-
 ## Getting Started
 
 This guide takes a brand-new project (one that has never used `furo-vue`) from
