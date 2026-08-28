@@ -15,17 +15,7 @@ Node.js is required. If you haven't installed it yet, please do so first.
 | Node.js | ^20.19.2 |
 | npm | ^10.9.0 |
 
-## (2) Setting up `.npmrc`
-
-Create a `.npmrc` file in your project's root directory and add the necessary configuration.
-
-Add the following line to your `.npmrc` file:
-
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
-
-## (3) Install Command
+## (2) Install Command
 
 You can install `furo` with the following command:
 
