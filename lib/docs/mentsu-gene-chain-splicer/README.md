@@ -9,14 +9,6 @@ A JavaScript utility for dynamically extending object instances by splicing meth
 - Node.js >= 20.0.0
 - npm >= 10.0.0
 
-## Setting up `.npmrc`
-
-This package is published to GitHub Packages. Create a `.npmrc` file in your project root:
-
-```plaintext
-@openreachtech:registry=https://npm.pkg.github.com
-```
-
 ## Install
 
 ```bash
