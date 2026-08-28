@@ -16,14 +16,6 @@
   npm install --save-dev jest
   ```
 
-* Create a `.npmrc` file in the root directory of your project and add any necessary configurations. This might be required for installing certain npm packages.
-
-* Please add the following line to your `.npmrc` file.
-
-  ```
-  @openreachtech:registry=https://npm.pkg.github.com
-  ```
-
 * You can install `ConstructorSpy` with Jest version 29.5.0 or greater by the following command:
 
   ```
