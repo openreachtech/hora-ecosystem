@@ -13,16 +13,6 @@ Node.js is required. If you haven't installed it yet, please install it first.
 | Node.js | ^20.14.0 |
 | npm | ^10.9.2 |
 
-## Setting up `.npmrc`
-
-Create a `.npmrc` file in your project's root directory and add the necessary settings.
-
-Add the following line to your `.npmrc` file:
-
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
-
 ## Command
 
 You can install `mentsu-rootpath` with the following command:
@@ -55,7 +45,7 @@ console.log(
 
 # License
 
-This project is released under the MIT License.
+This project is released under the Apache License 2.0.
 
 For more details, please see [in the LICENSE file](./LICENSE).
 

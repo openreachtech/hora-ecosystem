@@ -4,9 +4,38 @@ A lightweight Kafka consumer daemon toolkit built on top of kafkajs.
 
 This guide shows the minimum setup to run the package with a local Docker stack (MariaDB + Kafka + Debezium), implement two consumers with one engine, and start the daemon by script.
 
-## 1. Setup Docker environment
+## Installation
 
-### 1.1 Start services
+Requires Node.js 20.x (the version the CI builds against).
+
+```sh
+npm install @openreachtech/renchan-kafka
+```
+
+When using GitHub Packages (the `@openreachtech` scope), the following two items are
+required:
+
+1. Add the registry to your project's `.npmrc`:
+
+   ```
+   @openreachtech:registry=https://npm.pkg.github.com
+   ```
+
+2. Authenticate with `npm login`:
+
+   ```sh
+   npm login --registry https://npm.pkg.github.com
+   ```
+
+It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
+
+## Usage
+
+The following walkthrough sets up a local environment, implements two consumers behind a single engine, and runs the consumer daemon end to end.
+
+### 1. Setup Docker environment
+
+#### 1.1 Start services
 
 Sample docker file, name it `docker-compose.development.yml`
 
@@ -20,7 +49,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: demo_db
-    # Binlog（変更ログ）を有効化するための設定
+    # Settings to enable the binlog (change log)
     command:
       - --server-id=1
       - --log-bin=mariadb-bin
@@ -70,7 +99,7 @@ Run:
 docker compose -f docker-compose.development.yml up
 ```
 
-### 1.2 Create demo tables
+#### 1.2 Create demo tables
 
 ```bash
 docker exec -it mariadb_demo mysql -uroot -prootpassword -e '
@@ -87,16 +116,16 @@ CREATE TABLE user_amounts (
 '
 ```
 
-## 2. Implement minimum application (two consumers + one engine)
+### 2. Implement minimum application (two consumers + one engine)
 
-### 2.1 Install package
+#### 2.1 Install package
 
 ```bash
 npm install @openreachtech/renchan-kafka
 npm install @openreachtech/mentsu-rootpath
 ```
 
-### 2.2 Suggested structure
+#### 2.2 Suggested structure
 
 ```text
 your-app/
@@ -114,11 +143,11 @@ your-app/
   .env.development
 ```
 
-### 2.3 Add .env.example file
+#### 2.3 Add .env.example file
 
 Add an empty .env.example file to the root directory.
 
-### 2.4 Register Debezium connector
+#### 2.4 Register Debezium connector
 
 Create src/kafka/connectors/MariadbConnector.js
 
@@ -140,7 +169,7 @@ export default class MariadbConnector extends BaseConnector {
 }
 ```
 
-### 2.5 Consumer #1 (eachMessage)
+#### 2.5 Consumer #1 (eachMessage)
 
 Create src/kafka/consumers/eachMessageConsumers/UserEachMessageConsumer.js:
 
@@ -225,7 +254,7 @@ export default class UserEachMessageConsumer extends BaseEachMessageConsumer {
 }
 ```
 
-### 2.6 Consumer #2 (eachBatch)
+#### 2.6 Consumer #2 (eachBatch)
 
 Create src/kafka/consumers/eachBatchConsumers/UserAmountEachBatchConsumer.js:
 
@@ -308,7 +337,7 @@ export default class UserAmountEachBatchConsumer extends BaseEachBatchConsumer {
 }
 ```
 
-### 2.7 Single engine for both consumers
+#### 2.7 Single engine for both consumers
 
 Create src/kafka/engine/AppKafkaEngine.js:
 
@@ -358,9 +387,9 @@ export default class AppKafkaEngine extends BaseKafkaEngine {
 }
 ```
 
-## 3. Start application by script
+### 3. Start application by script
 
-### 3.1 Create connector
+#### 3.1 Create connector
 Create src/kafka/scripts/create-connector-client.js:
 
 ```js
@@ -404,7 +433,7 @@ Run:
 NODE_ENV=development node src/kafka/scripts/create-connector-client.js
 ```
 
-### 3.2 Run Daemon
+#### 3.2 Run Daemon
 Create src/kafka/scripts/run-kafka-daemon.js:
 
 ```js
@@ -439,7 +468,7 @@ NODE_ENV=development node ./src/kafka/scripts/run-kafka-daemon.js
 
 Keep this terminal to see the consumers log.
 
-## 4. Test
+### 4. Test
 
 Open new terminal and Produce CDC events by changing MariaDB data:
 
@@ -463,3 +492,91 @@ DELETE FROM user_amounts WHERE id = 999;
 ```
 
 You should see logs from both consumers for INSERT, UPDATE, and DELETE events.
+
+## API
+
+Class members are written with the following notation.
+
+| notation | members |
+| :-- | :-- |
+| `#instanceProperty` | instance property |
+| `#instanceMethod()` | instance method |
+| `#get:instanceGetter` | instance getter |
+| `#set:instanceSetter` | instance setter |
+| `.staticProperty` | static property |
+| `.staticMethod()` | static method |
+| `.get:staticGetter` | static getter |
+| `.set:staticSetter` | static setter |
+
+### Daemon & Engine
+
+- **`KafkaConsumersDaemon`** — boots every consumer discovered by the engine and runs them until shutdown.
+  - `.createAsync()` — build a daemon for a given `EngineCtor`.
+  - `#startDaemon()` — start consuming and block until the process is stopped.
+- **`BaseKafkaEngine`** — declares the Kafka connection, where consumers live, and the shared DI classes. Extend it and override:
+  - `.get:config` — `kafkaOptionHash`, `consumersPath`, and `consumerOptionHash`.
+  - `.get:ShareCtor` — the `BaseKafkaShare` subclass shared across consumers.
+  - `.get:ContextCtor` — the `BaseKafkaContext` subclass built per consumer.
+  - `.get:standardErrorCodeHash` — error codes shared across the engine.
+- **`BaseKafkaShare`** — per-process container of shared singletons handed to every consumer.
+- **`BaseKafkaContext`** — per-consumer context built by the engine.
+
+### Consumers
+
+- **`BaseConsumer`** — the abstract base for all consumers.
+- **`BaseEachMessageConsumer`** — processes one message at a time. Extend it and override:
+  - `.get:config` — consumer options such as `groupId`.
+  - `.get:MessageDeserializerCtor` / `.get:MessageKeyCtor` / `.get:MessageValueCtor` / `.get:ConsumerParcelCtor` — the message-shaping classes.
+  - `.collectTopics()` — the topics this consumer subscribes to.
+  - `#onEachMessage()` — the per-message handler you implement.
+- **`BaseEachBatchConsumer`** — processes a batch of messages, with the same override surface as `BaseEachMessageConsumer`.
+- **`BatchMessageProgress`** — tracks per-batch processing progress.
+
+### Messages
+
+- **`ConsumerMessage`** — a single consumed message, exposing its deserialized key/value.
+- **Deserializers** — `BaseMessageDeserializer`, `JsonMessageDeserializer`, `BufferMessageDeserializer`.
+- **Values** — `BaseMessageValue`, `DebeziumMessageValue` (normalizes Debezium CDC payloads).
+- **Keys** — `BaseMessageKey`, `DebeziumMessageKey`.
+- **Parcels** — `BaseConsumerParcel`, `EachMessageConsumerParcel`, `EachBatchConsumerParcel`.
+
+### Connectors & client
+
+- **`BaseConnector`** (with `AbstractCoreConnector` / `AbstractWorkflowConnector`) — registers and manages Debezium connectors over the Kafka Connect REST API. Extend it and override:
+  - `.get:connectorName` — the connector name.
+  - `.buildConfig()` — the connector base configuration.
+  - `#createConnectorFromBodyConfig()` — create the connector from a body config.
+- **Client three-class structure** — `BaseKafkaLauncher`, `BaseKafkaPayload`, `BaseKafkaCapsule`, plus the request/response bodies (`KafkaRequestBody`, `KafkaRequestQuery`, `KafkaResponseBody`) and the concrete `CreateConnector*` / `PutConnectorConfig*` operations.
+
+### Errors
+
+- **`KafkaError`** — base error type for the package.
+- **`ConcreteMemberNotFoundKafkaError`** — thrown when a required concrete member is not implemented.
+
+## Contribution
+
+Bug reports, feature requests, and code contributions are welcome.
+
+Feel free to contact us through GitHub Issues.
+
+```sh
+git clone https://github.com/openreachtech/renchan-kafka.git
+cd renchan-kafka
+npm install
+npm run lint
+npm test
+```
+
+## License
+
+This project is released under the Apache License 2.0.
+
+For more details, please see [in the LICENSE file](./LICENSE).
+
+## Developer
+
+[Open Reach Tech Inc.](https://openreach.tech)
+
+## Copyright
+
+© 2026 Open Reach Tech Inc.
