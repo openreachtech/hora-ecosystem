@@ -1,59 +1,54 @@
-# Overview
+# furo
 
 `furo` is a library that supports front-end development.
 
 Since it is written in pure JavaScript, it works with any front-end framework or library, such as Vue or React.
 
-# Installation
+## Installation
 
-## (1) `Node.js` and `npm`
+Requires Node.js 20.x or later.
 
-Node.js is required. If you haven't installed it yet, please do so first.
-
-| Tool | Version |
-| :-- | :-- |
-| Node.js | ^20.19.2 |
-| npm | ^10.9.0 |
-
-## (2) Setting up `.npmrc`
-
-Create a `.npmrc` file in your project's root directory and add the necessary configuration.
-
-Add the following line to your `.npmrc` file:
-
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
-
-## (3) Install Command
-
-You can install `furo` with the following command:
-
-```
+```sh
 npm install @openreachtech/furo
 ```
 
-# Features
+It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
 
-## (1) GraphQL Client
+## Features
 
-[Usage of GraphQL client](graphql-client.doc.md)
+### (1) GraphQL Client
 
-## (2) Form Element Clerk
+[Usage of GraphQL client](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/graphql-client.md)
 
-[Usage of Form element clerk](form-clerk.doc.md)
+### (2) RESTful API Client
 
-## (3) Storage Clerk
+[Usage of RESTful API client](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/restful-api-client.md)
 
-[Usage of Storage clerk](storage-clerk.doc.md)
+### (3) Form Element Clerk
 
-# License
+[Usage of form element clerk](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/form-element-clerk.md)
 
-This project is released under the MIT License.
+### (4) Storage Clerk
 
-See [LICENSE](./LICENSE) for details.
+[Usage of storage clerk](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/storage-clerk.md)
 
-# Contributing
+### (5) IndexedDB Client
+
+[Usage of IndexedDB client](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/indexed-db-client.md)
+
+### (6) HTTP Client Tools
+
+[Usage of HTTP client tools](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/client-tools.md)
+
+### (7) Dynamic Class Declaration
+
+[Usage of dynamic class declaration](https://github.com/openreachtech/furo-core/blob/main/docs/en/features/dynamic-class-declaration.md)
+
+## API
+
+[API reference](https://github.com/openreachtech/furo-core/blob/main/docs/en/api/index.md)
+
+## Contribution
 
 Bug reports, feature requests, and code contributions are welcome.
 
@@ -67,10 +62,16 @@ npm run lint
 npm test
 ```
 
-# Developers
+## License
+
+This project is released under the Apache License 2.0.
+
+For more details, please see [in the LICENSE file](./LICENSE).
+
+## Developer
 
 [Open Reach Tech Inc.](https://openreach.tech)
 
-# Copyright
+## Copyright
 
 © 2025 Open Reach Tech Inc.
