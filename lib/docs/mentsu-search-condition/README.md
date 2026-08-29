@@ -13,14 +13,9 @@ tree into SQL / Elasticsearch is the consuming backend's job.
 > Read [`docs/en/ai-context.md`](https://github.com/openreachtech/mentsu-search-condition/blob/main/docs/en/ai-context.md)
 > for the full API reference and the backend integration contract.
 
-## Install
+## Installation
 
-GitHub Packages, with a token that has `read:packages`:
-
-```ini
-# .npmrc
-@openreachtech:registry = https://npm.pkg.github.com
-```
+Requires Node.js 20.x (the version the CI builds against).
 
 ```sh
 npm install @openreachtech/mentsu-search-condition
@@ -193,7 +188,9 @@ npm test
 
 ## License
 
-UNLICENSED
+This project is released under the Apache License 2.0.
+
+For more details, please see [in the LICENSE file](./LICENSE).
 
 ## Developer
 
