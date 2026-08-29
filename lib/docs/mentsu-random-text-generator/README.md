@@ -10,21 +10,6 @@ Requires Node.js 20.x (the version the CI builds against).
 npm install @openreachtech/mentsu-random-text-generator
 ```
 
-When using GitHub Packages (the `@openreachtech` scope), the following two items are
-required:
-
-1. Add the registry to your project's `.npmrc`:
-
-   ```
-   @openreachtech:registry=https://npm.pkg.github.com
-   ```
-
-2. Authenticate with `npm login`:
-
-   ```sh
-   npm login --registry https://npm.pkg.github.com
-   ```
-
 It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
 
 ## Usage
@@ -127,7 +112,7 @@ npm test
 
 ## License
 
-This project is released under the MIT License.
+This project is released under the Apache License 2.0.
 
 For more details, please see [in the LICENSE file](./LICENSE).
 
