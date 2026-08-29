@@ -1,6 +1,6 @@
 {
   "name": "@openreachtech/hora-ecosystem",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Module catalog of Hora Kit ecosystem",
   "type": "module",
   "main": "index.js",
