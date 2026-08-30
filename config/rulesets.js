@@ -49,6 +49,9 @@ const RULESETS = {
     'mentsu-agent-*',
 
     'renchan-dynamic-field-mutator',
+    'renchan-tools-aws-s3-client',
+    'renchan-tools-coinpayments',
+    'renchan-tools-mailgun-client',
     'renchan-tools-twilio',
     'renchan-tools-line-login-api',
     'renchan-tools-line-messaging-api',

@@ -10,21 +10,6 @@ Requires Node.js `^20.19.2` and npm `^10.9.0` (the versions the CI builds agains
 npm install @openreachtech/furo-vue
 ```
 
-When using GitHub Packages (the `@openreachtech` scope), the following two items are
-required:
-
-1. Add the registry to your project's `.npmrc`:
-
-   ```
-   @openreachtech:registry=https://npm.pkg.github.com
-   ```
-
-2. Authenticate with `npm login`:
-
-   ```sh
-   npm login --registry https://npm.pkg.github.com
-   ```
-
 ## Getting Started
 
 This guide takes a brand-new project (one that has never used `furo-vue`) from
@@ -171,12 +156,54 @@ Mount `<FuroToaster />` once near your app root, then call the imperative
 ```js
 import {
   toast,
-} from '@openreachtech/furo-vue/toast'
+} from '@openreachtech/furo-vue'
 
 toast.show({ title: 'Saved', type: 'success' })
 ```
 
-### (7) Discover every component
+### (7) Icons the library does not ship
+
+Icons resolve offline, so `FuroIcon` draws only the data it holds: the 49 icons
+the library ships, plus whatever your application registers. Register yours once
+at start-up, before the first render:
+
+```js
+import {
+  furoIconRegistry,
+} from '@openreachtech/furo-vue/icons'
+
+furoIconRegistry.registerIconSet({
+  iconSet: applicationIconSet,
+})
+```
+
+A name nothing resolves throws outside a production build, naming the icon, so a
+missing icon never hides as an empty box. A production build draws the warning
+glyph instead.
+
+To reach every name rather than registering them one by one, install your own
+renderer. The registry still answers first, so the library's own icons keep
+drawing offline whatever you install:
+
+```js
+furoIconRegistry.useIconRenderer({
+  component: applicationIconComponent,
+})
+```
+
+A Nuxt application gets this from the module instead:
+
+```js
+// nuxt.config.js
+modules: ['@nuxt/icon', '@openreachtech/furo-vue/nuxt']
+```
+
+A plain Vue application gets it from `createIconifyRenderer()`, exported at
+`@openreachtech/furo-vue/icon-renderers`. Full API, including single-icon
+registration and a lazy resolver:
+[docs/furo-icon.md](https://github.com/openreachtech/furo-vue/blob/main/docs/furo-icon.md).
+
+### (8) Discover every component
 
 - Human catalog (grouped by layer, with use cases): [docs/COMPONENTS.md](https://github.com/openreachtech/furo-vue/blob/main/docs/COMPONENTS.md)
 - Machine-readable manifest (for AI agents and tooling): `public/furo-vue/components.json`
@@ -188,12 +215,12 @@ Maintainers regenerate these from the doc registry with:
 npm run docs:manifest
 ```
 
-### (8) GraphQL, fetchers, and page templates (out of scope here)
+### (9) GraphQL, fetchers, and page templates (out of scope here)
 
 `furo-vue` ships presentational atoms, molecules, and organisms only. GraphQL
 launchers, fetcher/submitter adapters, and page-level templates (ListView,
 DetailView, …) live in the consumer app. See
-[docs/product/overview.md](https://github.com/openreachtech/furo-vue/blob/main/docs/product/overview.md)
+[docs/furo-vue/README.md](https://github.com/openreachtech/furo-vue/blob/main/docs/furo-vue/README.md)
 for the scope boundary and
 [docs/furo-vue/architecture.md](https://github.com/openreachtech/furo-vue/blob/main/docs/furo-vue/architecture.md)
 for layer rules.
@@ -293,7 +320,7 @@ npm test
 
 ## License
 
-This project is released under the MIT License.
+This project is released under the Apache License 2.0.
 
 For more details, please see [in the LICENSE file](./LICENSE).
 

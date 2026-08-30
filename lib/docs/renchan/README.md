@@ -10,18 +10,8 @@ Node.js is required. If you haven't installed it yet, please do so first.
 
 | Tool | Version |
 | :-- | :-- |
-| Node.js | ^20.19.2 |
+| Node.js | >=20.0.0 |
 | npm | ^10.9.0 |
-
-## Setting up `.npmrc`
-
-Create a `.npmrc` file in your project's root directory and add the necessary configuration.
-
-Add the following line to your `.npmrc` file:
-
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
 
 ## Command
 
@@ -166,9 +156,9 @@ builder.buildHttpServer()
 
 ## License
 
-This project is released under the MIT License.
+This project is released under the Apache License 2.0.
 
-See [LICENSE](./LICENSE) for details.
+For more details, please see [in the LICENSE file](./LICENSE).
 
 ## Contributing
 
@@ -186,7 +176,7 @@ npm test
 
 ## Developers
 
-[Open Reach Tech inc.](https://openreach.tech)
+[Open Reach Tech Inc.](https://openreach.tech)
 
 ## Copyright
 

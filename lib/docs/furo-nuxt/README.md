@@ -1,59 +1,64 @@
-# Overview
+# @openreachtech/furo-nuxt
 
-`furo-nuxt` is a library that supports Nuxt development.
+`furo-nuxt` is a library that brings [furo](https://github.com/openreachtech/furo) into Nuxt applications.
 
-# Installation
+日本語版は [README.ja.md](./README.ja.md) を参照してください。
 
-## (1) `Node.js` and `npm`
+## Concept
 
-Node.js is required. If you haven't installed it yet, please do so first.
+`furo` itself is written in pure JavaScript, so every `furo` feature already works inside a Nuxt application as-is.
 
-| Tool | Version |
-| :-- | :-- |
-| Node.js | ^20.19.2 |
-| npm | ^10.9.0 |
+`furo-nuxt` adds the Nuxt- and Vue-specific layer on top of it:
 
-## (2) Setting up `.npmrc`
+- Composables that bind `furo` clients (GraphQL, RESTful API, subscriptions) to Vue refs.
+- A context class family that keeps component logic out of `<template>` and `setup()`.
+- Ready-made components (dialog, layouts, pagination, tab) and their base stylesheets. Deprecated since 1.12.0, removed in 2.0.0.
+- Tools for loading environment values and sharing them across the Nuxt app.
 
-Create a `.npmrc` file in your project's root directory and add the necessary configuration.
+## Installation
 
-Add the following line to your `.npmrc` file:
+Requires Node.js 20.x (the version the CI builds against).
 
-```
-@openreachtech:registry=https://npm.pkg.github.com
-```
-
-## (3) Install Command
-
-You can install `furo` with the following command:
-
-```
+```sh
 npm install @openreachtech/furo-nuxt
 ```
 
-# Features
+It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
 
-## (1) Features of `furo`
+## Features
 
-Basically, you can use `furo` features in your Nuxt applications.
+### (1) GraphQL Client
 
-Since `furo` is written in pure JavaScript, all `furo` features work with Nuxt.
+[Usage of GraphQL client](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/graphql-client.md)
 
-## (2) GraphQL Client
+### (2) Form Element Clerk
 
-[Usage of GraphQL client](graphql-client.doc.md)
+[Usage of form element clerk](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/form-clerk.md)
 
-## (3) Form Element Clerk
+### (3) RESTful API Client
 
-[Usage of Form element clerk](form-clerk.doc.md)
+[Usage of RESTful API client](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/restful-api-client.md)
 
-# License
+### (4) Component Context
 
-This project is released under the MIT License.
+[Usage of component context](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/component-context.md)
 
-See [LICENSE](./LICENSE) for details.
+### (5) Components (deprecated since 1.12.0, removed in 2.0.0)
 
-# Contributing
+[Usage of components](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/components.md)
+
+The components, their context classes, `0200.base.css` and `0300.gimmick.css` all leave the package at the next major
+version. Copy what you use into your own app first; the doc above carries the migration steps.
+
+### (6) Application Setup
+
+[Usage of application setup](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/app-setup.md)
+
+## API
+
+[API references](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/api/index.md)
+
+## Contribution
 
 Bug reports, feature requests, and code contributions are welcome.
 
@@ -67,10 +72,16 @@ npm run lint
 npm test
 ```
 
-# Developers
+## License
+
+This project is released under the Apache License 2.0.
+
+For more details, please see [in the LICENSE file](./LICENSE).
+
+## Developer
 
 [Open Reach Tech Inc.](https://openreach.tech)
 
-# Copyright
+## Copyright
 
 © 2025 Open Reach Tech Inc.
