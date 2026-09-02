@@ -37,6 +37,33 @@ See [`.claude/skills/scribe/SKILL.md`](./.claude/skills/scribe/SKILL.md) for the
 2. For any newly-`true` package that's actually published (to npmjs.com or GitHub Packages) and not yet in `devDependencies`, add it and run `npm install`.
 3. Run `/scribe` to generate docs for whatever's newly available.
 
+## Dependency overrides
+
+`package.json` carries three overrides. Two are ordinary and one is not,
+and `package.json` cannot hold a comment saying which.
+
+| Override | Dependant's range | Verdict |
+|---|---|---|
+| `minimatch@3.1.5` &rarr; `brace-expansion: ^1.1.17` | `^1.1.7` | inside it |
+| `minimatch@9.0.9` &rarr; `brace-expansion: ^2.1.3` | `^2.0.2` | inside it |
+| `uuid: ^11.1.1` | `sequelize@6.37.8` asks for `^8.3.2` | **three majors outside it** |
+
+The first two raise a package within the major line its dependant
+declared, which is what an override is for.
+
+The third does not, and it was taken deliberately. The advisory against
+`uuid` is fixed in 11.1.1 and in no 8.x release, so there is no
+in-range version to move to — `npm audit` reported it as having no fix
+available. What makes it safe here is that `uuid` 11 still ships a CJS
+entry, so `sequelize`'s `require('uuid')` resolves, and that `sequelize`
+is a devDependency of a package whose `dependencies` are empty and
+whose published files are `config/`, `lib/` and `types/`. Nothing this
+package ships reaches it.
+
+**Check this override again whenever `sequelize` moves.** A range
+violation holds only as long as the code behind it does not change, and
+nothing in npm will report when that stops being true.
+
 ## Language mirror
 
 Both skills live under `.claude/skills/` in English. A Japanese mirror is kept in sync under `.scratch/skills/` (gitignored, local-only) whenever a skill is edited.
