@@ -16,20 +16,6 @@ Node.js 20.x が必要です(CIがビルド対象とするバージョン)。
 npm install @openreachtech/hora-ecosystem
 ```
 
-GitHub Packages(`@openreachtech` スコープ)を利用する場合、以下の二項目が必要です。
-
-1. `.npmrc` にレジストリを追記する:
-
-   ```
-   @openreachtech:registry=https://npm.pkg.github.com
-   ```
-
-2. `npm login` で認証する:
-
-   ```sh
-   npm login --registry https://npm.pkg.github.com
-   ```
-
 ES モジュール(`"type": "module"`)です。ESM の `import` 構文でインポートしてください。
 
 ## 使い方
