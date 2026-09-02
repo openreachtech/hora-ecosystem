@@ -10,7 +10,7 @@ Open Reach Techのエコシステムパッケージ群(`renchan-*` / `furo-*` / 
 
 ## インストール
 
-Node.js 20.x が必要です(CIがビルド対象とするバージョン)。
+Node.js 20.0.0 以降が必要です(`package.json` の `engines` が宣言している下限)。CI は現行の LTS でビルドしています。
 
 ```sh
 npm install @openreachtech/hora-ecosystem
