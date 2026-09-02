@@ -31,7 +31,7 @@
   "devDependencies": {
     "@openreachtech/eslint-config": "^4.5.0",
     "@openreachtech/furo": "^1.11.0",
-    "@openreachtech/furo-nuxt": "^1.12.0",
+    "@openreachtech/furo-nuxt": "^2.0.0",
     "@openreachtech/furo-vue": "^1.3.2",
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-deep-containing": "^1.0.2",
@@ -50,6 +50,7 @@
     "@openreachtech/mentsu-rootpath": "^1.1.3",
     "@openreachtech/mentsu-schema": "^1.2.2",
     "@openreachtech/mentsu-search-condition": "^1.0.2",
+    "@openreachtech/mentsu-testcase-cache": "^0.0.0",
     "@openreachtech/mentsu-text-case-tools": "^1.0.3",
     "@openreachtech/mentsu-validation-rules": "^1.0.2",
     "@openreachtech/mentsu-value-inspector": "^1.1.1",
@@ -61,10 +62,13 @@
     "@openreachtech/renchan-job-bullmq": "^1.1.3",
     "@openreachtech/renchan-kafka": "^1.1.2",
     "@openreachtech/renchan-replica-fragments": "^1.6.1",
-    "@openreachtech/renchan-sequelize": "^2.2.1",
+    "@openreachtech/renchan-sequelize": "^2.2.2",
     "@types/jest": "^30.0.0",
     "eslint": "^9.39.5",
     "jest": "^30.4.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
   },
   "overrides": {
     "minimatch@3.1.5": {
@@ -72,6 +76,7 @@
     },
     "minimatch@9.0.9": {
       "brace-expansion": "^2.1.3"
-    }
+    },
+    "uuid": "^11.1.1"
   }
 }

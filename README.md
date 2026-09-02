@@ -10,7 +10,7 @@ The catalog content isn't written for human readability — it only needs to be 
 
 ## Installation
 
-Requires Node.js 20.x (the version the CI builds against).
+Requires Node.js 20.0.0 or newer, the floor `engines` declares. The CI builds against the current LTS.
 
 ```sh
 npm install @openreachtech/hora-ecosystem
