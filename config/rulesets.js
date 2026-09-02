@@ -46,9 +46,12 @@ const RULESETS = {
     'renchan-tutotiral-*',
   ],
   'turned-off': [
+    'mentsu-action-value',
     'mentsu-agent-*',
+    'mentsu-encipher',
 
     'renchan-dynamic-field-mutator',
+    'renchan-list-view',
     'renchan-tools-aws-s3-client',
     'renchan-tools-coinpayments',
     'renchan-tools-mailgun-client',

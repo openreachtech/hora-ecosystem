@@ -12,8 +12,10 @@
 
 - Composables that bind `furo` clients (GraphQL, RESTful API, subscriptions) to Vue refs.
 - A context class family that keeps component logic out of `<template>` and `setup()`.
-- Ready-made components (dialog, layouts, pagination, tab) and their base stylesheets. Deprecated since 1.12.0, removed in 2.0.0.
 - Tools for loading environment values and sharing them across the Nuxt app.
+
+`furo-nuxt` gives you a base for **how to write logic**. It deliberately ships no components and no stylesheets: markup and
+design belong to your application, not to this package.
 
 ## Installation
 
@@ -43,14 +45,7 @@ It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
 
 [Usage of component context](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/component-context.md)
 
-### (5) Components (deprecated since 1.12.0, removed in 2.0.0)
-
-[Usage of components](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/components.md)
-
-The components, their context classes, `0200.base.css` and `0300.gimmick.css` all leave the package at the next major
-version. Copy what you use into your own app first; the doc above carries the migration steps.
-
-### (6) Application Setup
+### (5) Application Setup
 
 [Usage of application setup](https://github.com/openreachtech/furo-nuxt/blob/main/docs/en/features/app-setup.md)
 

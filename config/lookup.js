@@ -15,12 +15,14 @@ const TARGET_REPOSITORIES = {
   'jest-constructor-spy': true,
   'jest-deep-containing': true,
   'jest-expect-each': true,
+  'mentsu-action-value': false, // ❌️
   'mentsu-agent-loop-core': false, // ❌️
   'mentsu-agent-loop-graphql': false, // ❌️
   'mentsu-agent-loop-renchan-job': false, // ❌️
   'mentsu-bound-ctor-registry': true,
   'mentsu-deep-loader': true,
   'mentsu-deep-value-converter': true,
+  'mentsu-encipher': false, // ❌️
   'mentsu-field-path-value-extractor': true,
   'mentsu-gene-chain-splicer': true,
   'mentsu-logger': true,
@@ -32,6 +34,7 @@ const TARGET_REPOSITORIES = {
   'mentsu-rootpath': true,
   'mentsu-schema': true,
   'mentsu-search-condition': true,
+  'mentsu-testcase-cache': true,
   'mentsu-text-case-tools': true,
   'mentsu-validation-rules': true,
   'mentsu-value-inspector': true,
@@ -43,13 +46,14 @@ const TARGET_REPOSITORIES = {
   'renchan-funnel': true,
   'renchan-job-bullmq': true,
   'renchan-kafka': true,
+  'renchan-list-view': false, // ❌️
   'renchan-replica-fragments': true,
   'renchan-sequelize': true,
   'renchan-tools-aws-s3-client': false, // ❌️
   'renchan-tools-coinpayments': false, // ❌️
-  'renchan-tools-mailgun-client': false, // ❌️
   'renchan-tools-line-login-api': false, // ❌️
   'renchan-tools-line-messaging-api': false, // ❌️
+  'renchan-tools-mailgun-client': false, // ❌️
   'renchan-tools-twilio': false, // ❌️
 }
 
