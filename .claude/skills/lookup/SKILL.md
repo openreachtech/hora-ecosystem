@@ -10,7 +10,7 @@ description: >
 
 # Target Repositories Skill
 
-`config/lookup.js` is the aggregate file holding the list of ORT repositories to target for the Hora ecosystem catalog, shaped as `{ 'repo-name': boolean, ... }`. A repository matching `excludes` is not listed as `false` — its key is omitted entirely. Regenerate it following the steps below.
+`config/lookup.js` is the aggregate file holding the list of ORT repositories to target for the Hora ecosystem catalog, shaped as `{ 'repo-name': boolean, ... }`. A repository matching `excludes` is not listed as `false` — its key is omitted entirely. A repository matching `turned-off`, by contrast, does get a key, with its value set to `false`, so that the file states outright that the module is known to exist and is switched off for now. Regenerate it following the steps below.
 
 ## Prerequisites
 
