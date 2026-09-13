@@ -57,7 +57,7 @@ in-range version to move to — `npm audit` reported it as having no fix
 available. What makes it safe here is that `uuid` 11 still ships a CJS
 entry, so `sequelize`'s `require('uuid')` resolves, and that `sequelize`
 is a devDependency of a package whose `dependencies` are empty and
-whose published files are `config/`, `lib/` and `types/`. Nothing this
+whose published files are `config/` and `lib/`. Nothing this
 package ships reaches it.
 
 **Check this override again whenever `sequelize` moves.** A range
