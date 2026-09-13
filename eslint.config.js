@@ -6,14 +6,6 @@ export default [
   ...openreachtechConfig,
 
   {
-    languageOptions: {
-      globals: {
-        constructorSpy: 'readonly',
-      },
-    },
-  },
-
-  {
     files: [
       'tests/**/*.js',
     ],
