@@ -6,23 +6,6 @@ export default [
   ...openreachtechConfig,
 
   {
-    languageOptions: {
-      globals: {
-        constructorSpy: 'readonly',
-      },
-    },
-  },
-
-  {
-    files: [
-      'tests/**/*.js',
-    ],
-    rules: {
-      'max-classes-per-file': 'off',
-    },
-  },
-
-  {
     ignores: [
       // Scratch space. `.gitignore` already excludes it, but flat config does
       // not read `.gitignore`, so without this entry a throwaway script left
