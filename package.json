@@ -71,10 +71,11 @@
     "@openreachtech/renchan-sequelize": "^2.2.2",
     "@types/jest": "^30.0.0",
     "eslint": "^9.39.5",
-    "jest": "^30.4.2"
+    "jest": "^30.5.1"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=11.10.0"
   },
   "overrides": {
     "minimatch@3.1.5": {
