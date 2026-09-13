@@ -9,7 +9,6 @@
     "types/",
     "!types/env/**"
   ],
-  "types": "./types/index.d.ts",
   "keywords": [
     "hora",
     "hora-kit",
