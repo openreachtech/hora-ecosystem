@@ -5,9 +5,7 @@
   "type": "module",
   "files": [
     "config/",
-    "lib/",
-    "types/",
-    "!types/env/**"
+    "lib/"
   ],
   "keywords": [
     "hora",
