@@ -40,24 +40,28 @@ A repository with value `false` is known to exist but intentionally excluded fro
 
 This file exists so that the generation skills know what to fetch. To find what the catalog holds, read `lib/docs/` below.
 
-### `lib/docs/<package-name>/`
+### `lib/docs/`
 
-For every package name that's `true` in `config/lookup.js`, this directory holds:
+The catalog itself. Every directory under it is one catalogued package, so listing them is how to find what the catalog holds.
 
-- `README.md` — a verbatim copy of that package's own README, when one exists.
-- `API.md` — a summary of the package's exported classes/functions and their public members, methods, and signatures, derived from its `.d.ts` or JSDoc.
-
-```js
-import { readFile } from 'node:fs/promises'
-
-const apiReference = await readFile(
-  new URL(
-    '../node_modules/@openreachtech/hora-ecosystem/lib/docs/mentsu-rootpath/API.md',
-    import.meta.url
-  ),
-  'utf-8'
-)
 ```
+lib/docs/
+├── furo/
+│   ├── README.md
+│   └── API.md
+├── mentsu-rootpath/
+│   ├── README.md
+│   └── API.md
+├── renchan/
+│   ├── README.md
+│   └── API.md
+└── ...
+```
+
+- `README.md` — a verbatim copy of that package's own README. Absent where the package ships none.
+- `API.md` — a summary of the package's exported classes and functions with their public members, methods and signatures, derived from its `.d.ts` or JSDoc.
+
+The directory names are **npm package names** with the `@openreachtech/` scope dropped. They are not the keys of `config/lookup.js`, which are repository names: `furo-core` publishes as `furo`, and `renchan-core` as `renchan`.
 
 ## Contribution
 

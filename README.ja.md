@@ -40,24 +40,28 @@ const TARGET_REPOSITORIES = {
 
 このファイルは、生成スキルが何を取得すべきかを知るために存在します。カタログの中身を知るには、下の`lib/docs/`を読んでください。
 
-### `lib/docs/<package-name>/`
+### `lib/docs/`
 
-`config/lookup.js`で`true`になっているパッケージ名ごとに、このディレクトリには以下が置かれます:
+カタログの本体です。配下のディレクトリ1つがカタログ済みのパッケージ1つにあたるので、これを列挙すればカタログの中身が分かります。
 
-- `README.md` — そのパッケージ自身のREADMEが存在する場合、その内容をそのまま複写したもの。
+```
+lib/docs/
+├── furo/
+│   ├── README.md
+│   └── API.md
+├── mentsu-rootpath/
+│   ├── README.md
+│   └── API.md
+├── renchan/
+│   ├── README.md
+│   └── API.md
+└── ...
+```
+
+- `README.md` — そのパッケージ自身のREADMEをそのまま複写したもの。上流がREADMEを持たない場合は置かれません。
 - `API.md` — パッケージがexportするクラス・関数と、その public なメンバー・メソッド・シグネチャの要約(`.d.ts`またはJSDocから抽出)。
 
-```js
-import { readFile } from 'node:fs/promises'
-
-const apiReference = await readFile(
-  new URL(
-    '../node_modules/@openreachtech/hora-ecosystem/lib/docs/mentsu-rootpath/API.md',
-    import.meta.url
-  ),
-  'utf-8'
-)
-```
+ディレクトリ名は**npmのパッケージ名**から`@openreachtech/`スコープを除いたものです。`config/lookup.js`のキー(リポジトリ名)とは別物で、`furo-core`は`furo`として、`renchan-core`は`renchan`として公開されています。
 
 ## コントリビューション
 
