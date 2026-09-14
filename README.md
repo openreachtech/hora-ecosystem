@@ -10,49 +10,56 @@ The catalog content isn't written for human readability — it only needs to be 
 
 ## Installation
 
-Requires Node.js 20.0.0 or newer, the floor `engines` declares. The CI builds against the current LTS.
+Requires Node.js 20.0.0 and npm 11.10.0 or newer, the floors `engines` declares. The CI builds against the current LTS.
 
 ```sh
 npm install @openreachtech/hora-ecosystem
 ```
 
-It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
-
 ## Usage
 
 ### `config/lookup.js`
 
-The whitelist of tracked packages, as a plain object mapping each package name (without the `@openreachtech/` scope) to whether it's currently catalogued:
+The ledger the catalog is generated from: every ORT repository that has been considered, mapped to whether it is currently catalogued.
 
 ```js
-import TARGET_PACKAGES from '@openreachtech/hora-ecosystem/config/lookup.js'
-
-Object.entries(TARGET_PACKAGES)
-  .filter(([, isCatalogued]) => isCatalogued)
-  .map(([packageName]) => packageName)
-// -> ['mentsu-rootpath', 'renchan-env', ...]
+const TARGET_REPOSITORIES = {
+  'furo-core': true,
+  'mentsu-rootpath': true,
+  'renchan-core': true,
+  'renchan-tools-twilio': false,
+  // ...
+}
 ```
 
-A package present with value `false` is known to exist but intentionally excluded from the catalog (e.g. deprecated, or not yet decided on); a package absent from this object entirely was never a candidate.
+The keys are **GitHub repository names** with the `openreachtech/` owner dropped — not npm package names. The two differ wherever a repository publishes under a different name.
 
-### `lib/docs/<package-name>/`
+A repository with value `false` is known to exist but intentionally excluded from the catalog (e.g. deprecated, or not yet decided on); one absent from this object entirely was never a candidate.
 
-For every package name that's `true` in `config/lookup.js`, this directory holds:
+This file exists so that the generation skills know what to fetch. To find what the catalog holds, read `lib/docs/` below.
 
-- `README.md` — a verbatim copy of that package's own README, when one exists.
-- `API.md` — a summary of the package's exported classes/functions and their public members, methods, and signatures, derived from its `.d.ts` or JSDoc.
+### `lib/docs/`
 
-```js
-import { readFile } from 'node:fs/promises'
+The catalog itself. Every directory under it is one catalogued package, so listing them is how to find what the catalog holds.
 
-const apiReference = await readFile(
-  new URL(
-    '../node_modules/@openreachtech/hora-ecosystem/lib/docs/mentsu-rootpath/API.md',
-    import.meta.url
-  ),
-  'utf-8'
-)
 ```
+lib/docs/
+├── furo/
+│   ├── README.md
+│   └── API.md
+├── mentsu-rootpath/
+│   ├── README.md
+│   └── API.md
+├── renchan/
+│   ├── README.md
+│   └── API.md
+└── ...
+```
+
+- `README.md` — a verbatim copy of that package's own README. Absent where the package ships none.
+- `API.md` — a summary of the package's exported classes and functions with their public members, methods and signatures, derived from its `.d.ts` or JSDoc.
+
+The directory names are **npm package names** with the `@openreachtech/` scope dropped. They are not the keys of `config/lookup.js`, which are repository names: `furo-core` publishes as `furo`, and `renchan-core` as `renchan`.
 
 ## Contribution
 
