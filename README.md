@@ -22,18 +22,23 @@ It is an ES module (`"type": "module"`); import it with ESM `import` syntax.
 
 ### `config/lookup.js`
 
-The whitelist of tracked packages, as a plain object mapping each package name (without the `@openreachtech/` scope) to whether it's currently catalogued:
+The ledger the catalog is generated from: every ORT repository that has been considered, mapped to whether it is currently catalogued.
 
 ```js
-import TARGET_PACKAGES from '@openreachtech/hora-ecosystem/config/lookup.js'
-
-Object.entries(TARGET_PACKAGES)
-  .filter(([, isCatalogued]) => isCatalogued)
-  .map(([packageName]) => packageName)
-// -> ['mentsu-rootpath', 'renchan-env', ...]
+const TARGET_REPOSITORIES = {
+  'furo-core': true,
+  'mentsu-rootpath': true,
+  'renchan-core': true,
+  'renchan-tools-twilio': false,
+  // ...
+}
 ```
 
-A package present with value `false` is known to exist but intentionally excluded from the catalog (e.g. deprecated, or not yet decided on); a package absent from this object entirely was never a candidate.
+The keys are **GitHub repository names** with the `openreachtech/` owner dropped — not npm package names. The two differ wherever a repository publishes under a different name.
+
+A repository with value `false` is known to exist but intentionally excluded from the catalog (e.g. deprecated, or not yet decided on); one absent from this object entirely was never a candidate.
+
+This file exists so that the generation skills know what to fetch. To find what the catalog holds, read `lib/docs/` below.
 
 ### `lib/docs/<package-name>/`
 

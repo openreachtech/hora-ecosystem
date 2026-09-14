@@ -22,18 +22,23 @@ ES モジュール(`"type": "module"`)です。ESM の `import` 構文でイン�
 
 ### `config/lookup.js`
 
-追跡対象パッケージのホワイトリストです。各パッケージ名(`@openreachtech/` スコープを除いたもの)を、現在カタログ化されているかどうかにマッピングした、単純なオブジェクトです:
+カタログを生成するための台帳です。検討対象になったORTのリポジトリを、現在カタログ化されているかどうかにマッピングしています。
 
 ```js
-import TARGET_PACKAGES from '@openreachtech/hora-ecosystem/config/lookup.js'
-
-Object.entries(TARGET_PACKAGES)
-  .filter(([, isCatalogued]) => isCatalogued)
-  .map(([packageName]) => packageName)
-// -> ['mentsu-rootpath', 'renchan-env', ...]
+const TARGET_REPOSITORIES = {
+  'furo-core': true,
+  'mentsu-rootpath': true,
+  'renchan-core': true,
+  'renchan-tools-twilio': false,
+  // ...
+}
 ```
 
-値が`false`で存在するパッケージは、存在は認識しているものの意図的にカタログ対象から外されているもの(非推奨、または未決定など)です。このオブジェクトに全く現れないパッケージは、そもそも候補になったことがないものです。
+キーは**GitHubのリポジトリ名**から`openreachtech/`のオーナー部分を除いたものであり、npmのパッケージ名ではありません。リポジトリと公開名が異なる場合、両者は食い違います。
+
+値が`false`のリポジトリは、存在は認識しているものの意図的にカタログ対象から外されているもの(非推奨、または未決定など)です。このオブジェクトに全く現れないリポジトリは、そもそも候補になったことがないものです。
+
+このファイルは、生成スキルが何を取得すべきかを知るために存在します。カタログの中身を知るには、下の`lib/docs/`を読んでください。
 
 ### `lib/docs/<package-name>/`
 
