@@ -39,28 +39,58 @@
 
 ## 依存の上書き
 
-`package.json` は 3 つの `overrides` を持ちます。2 つは通常のもので、1 つは違います。
-そして `package.json` には、どちらがどちらかを書くコメントが置けません。
+`package.json` は 4 つの `overrides` を持ち、そのすべてが、依存元の宣言した範囲の
+外へ版を動かしています。そして `package.json` には、その理由を書く
+コメントが置けません。
 
 | 上書き | 依存元の宣言範囲 | 判定 |
 |---|---|---|
-| `minimatch@3.1.5` &rarr; `brace-expansion: ^1.1.17` | `^1.1.7` | 範囲内 |
-| `minimatch@9.0.9` &rarr; `brace-expansion: ^2.1.3` | `^2.0.2` | 範囲内 |
+| `glob: ^14.0.2` | `@jest/reporters@30.5.2` は `^13.0.6` を要求 | **メジャー1つ分の範囲外** |
+| `glob: ^14.0.2` | `jest-config@30.5.2` は `^13.0.6` を要求 | **メジャー1つ分の範囲外** |
+| `glob: ^14.0.2` | `jest-runtime@30.5.2` は `^13.0.6` を要求 | **メジャー1つ分の範囲外** |
+| `glob: ^14.0.2` | `@vercel/nft@1.11.1` は `^13.0.0` を要求 | **メジャー1つ分の範囲外** |
+| `glob: ^14.0.2` | `test-exclude@7.0.2` は `^10.4.1` を要求 | **メジャー4つ分の範囲外** |
+| `minimatch@10: ^11.0.1` | `test-exclude@7.0.2` は `^10.2.2` を要求 | **メジャー1つ分の範囲外** |
+| `minimatch@10: ^11.0.1` | `readdir-glob@3.0.0` は `^10.2.2` を要求 | **メジャー1つ分の範囲外** |
+| `graphql-middleware` &rarr; `@graphql-tools/delegate: ^12.2.1` | `graphql-middleware@6.1.35` は `^8.8.1` を要求 | **メジャー4つ分の範囲外** |
+| `graphql-middleware` &rarr; `@graphql-tools/schema: ^10.1.5` | `graphql-middleware@6.1.35` は `^8.5.1` を要求 | **メジャー2つ分の範囲外** |
 | `uuid: ^11.1.1` | `sequelize@6.37.8` は `^8.3.2` を要求 | **メジャー3つ分の範囲外** |
 
-前の 2 つは、依存元が宣言したメジャー系列の中で版を上げています。`overrides` は
-そのためにあります。
+どれも意図して採った判断で、理由は同じです。advisory は新しいメジャーで修正され、
+依存元の範囲内のどの版にも修正がありません。つまり `npm audit` には、範囲内に
+移れる版がありませんでした。
 
-3 つ目は違い、これは意図して採った判断です。`uuid` の advisory は 11.1.1 で修正され、
-8.x のどの版にも修正はありません。つまり範囲内に移れる版が存在せず、`npm audit` も
-「修正版なし」と報告していました。ここで安全なのは、`uuid` 11 が CJS のエントリを
-維持しているため `sequelize` の `require('uuid')` が解決すること、そして `sequelize`
-がこのパッケージの devDependency であり、このパッケージの `dependencies` は空で、
-公開されるのは `config/`・`lib/` だけであることです。同梱物がここに触れる
-経路はありません。
+| パッケージ | advisory | 修正版 |
+|---|---|---|
+| `glob` | `GHSA-3g3m-2fjr-6pw4` | 14.0.2 |
+| `minimatch` | `GHSA-g3hv-75wg-m249` | 11.0.1 |
+| `@graphql-tools/utils` | `GHSA-7mx3-vvmw-hjmv` | 12.0.1 |
 
-**`sequelize` が動いたら、この上書きを必ず見直してください。** 範囲違反が成り立つのは
-その裏のコードが変わらない間だけで、それが崩れたことを npm は何も報告しません。
+`@graphql-tools/utils` 自体には上書きを置いていません。`@graphql-tools/delegate` と
+`@graphql-tools/schema` の 8 系がこれを `8.9.0` ちょうどに固定しているため、この
+2 つを上げることで修正済みの版が入ります。
+
+`minimatch` の上書きは 10 系だけに絞っています。`eslint` が要求する 3 系は advisory の
+対象外です。また `minimatch` 11 には default export がなく、`@eslint/config-array` の
+ESM エントリはそれを import しています。
+
+ここで安全だと言える理由は、それぞれ違います。
+
+- **`glob` と `minimatch`** 10 は、`jest` と `nuxt` のビルド用ツールを通って入ります。
+  両方の上書きを置いた状態で `npm test -- --coverage` が通り、このリポジトリは
+  `nuxt` を実行しません。
+- **`graphql-middleware`** は `@openreachtech/renchan` を通って入ります。`renchan` は
+  `/scribe` が読むためにここへ入れているもので、実行されることはありません。
+- **`uuid`** 11 は CJS のエントリを維持しているため、`sequelize` の
+  `require('uuid')` が解決します。
+
+いずれも、このパッケージの devDependencies の下にあります。このパッケージの
+`dependencies` は空で、公開されるのは `config/`・`lib/` だけです。同梱物がここに
+触れる経路はありません。
+
+**`jest`・`nuxt`・`@openreachtech/renchan`・`sequelize` のどれかが動いたら、これらの
+上書きを必ず見直してください。** 範囲違反が成り立つのはその裏のコードが変わらない
+間だけで、それが崩れたことを npm は何も報告しません。
 
 ## 言語ミラー
 
