@@ -1,6 +1,6 @@
 # API
 
-Source: no `README.md`/`README.ja.md` ship with this package, and `package.json` has no `"types"` field. `types/kafka.d.ts` and `types/jest.d.ts` only re-export ambient types from `@openreachtech/renchan-kafka`, `@openreachtech/jest-expect-each` and `@openreachtech/jest-deep-containing` for the package's own tests — they do not describe this package's API. Everything below was extracted from JSDoc across the 91 files under `lib/`.
+Source: `package.json` has no `"types"` field. `types/kafka.d.ts` and `types/jest.d.ts` only re-export ambient types from `@openreachtech/renchan-kafka`, `@openreachtech/jest-expect-each` and `@openreachtech/jest-deep-containing` for the package's own tests — they do not describe this package's API. Everything below was extracted from JSDoc across the 91 files under `lib/`.
 
 `@public`/`@protected`/`@private` JSDoc tags are used only in a minority of files (roughly 12 of 91), and even in those files only on some members. Where tags are present they are noted per class; where absent, every member documented via JSDoc is listed below as the natural consumer-facing surface (private implementation helpers with no JSDoc at all are omitted).
 
@@ -382,7 +382,7 @@ All 5 extend `BaseFunnelValueRetrieverSuite`, override `.get:sourceValueTypeKey`
 | `FixedValueSuite` | `FIXED_VALUE` | returns `funnelActionValue.value` unchanged (the literal) |
 | `NewValueSuite` | `NEW_VALUE` | `debeziumMessageValueExtractor.extractNewValue({ originObjectColumnId })` — post-change column value |
 | `OldValueSuite` | `OLD_VALUE` | `debeziumMessageValueExtractor.extractOldValue({ originObjectColumnId })` — pre-change column value |
-| `FieldReferenceSuite` | `FIELD_REFERENCE` | `fieldPathValueExtractor.extractFieldPathValue({ fieldPath: value.sourceFieldPath })` |
+| `FieldReferenceSuite` | `FIELD_REFERENCE` | drops the leading root-model segment of `value.sourceFieldPath` with `#extractRecordRelativeFieldPath({ fieldPath })` (`User.UserBasic.name` becomes `UserBasic.name`), then returns `fieldPathValueExtractor.extractFieldPathValue({ fieldPath })` for the remaining path |
 | `DynamicValueSuite` | `DYNAMIC_VALUE` | asks `dynamicValueSuiteProvider.generateDynamicValueSuite({ dynamicValueKey, offsetOption, option })` for a dynamic-value suite, returns its `resolveValue()` — **note**: this is a different concept from `BaseDynamicValueSuite` below (same "DynamicValue" name fragment, different subsystem); this class *delegates into* that subsystem rather than being related to it by inheritance |
 
 ### `FunnelValueRetrieverSuiteCtors`
