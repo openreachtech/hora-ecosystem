@@ -254,6 +254,8 @@ live inside the package:
 - `node_modules/@openreachtech/furo-vue/public/furo-vue/components.json` — the
   full manifest: for each component its `import` path, `props`, `parcel` keys,
   `events`, `slots`, and `features`.
+- `node_modules/@openreachtech/furo-vue/docs/` holds the spec that each manifest
+  `docs` path names, at the installed version.
 
 ### Point Claude Code at the manifest
 
