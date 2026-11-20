@@ -39,30 +39,59 @@ See [`.claude/skills/scribe/SKILL.md`](./.claude/skills/scribe/SKILL.md) for the
 
 ## Dependency overrides
 
-`package.json` carries three overrides. Two are ordinary and one is not,
-and `package.json` cannot hold a comment saying which.
+`package.json` carries four overrides, and every one of them moves a
+package outside the range its dependant declared. `package.json`
+cannot hold a comment saying why.
 
 | Override | Dependant's range | Verdict |
 |---|---|---|
-| `minimatch@3.1.5` &rarr; `brace-expansion: ^1.1.17` | `^1.1.7` | inside it |
-| `minimatch@9.0.9` &rarr; `brace-expansion: ^2.1.3` | `^2.0.2` | inside it |
+| `glob: ^14.0.2` | `@jest/reporters@30.5.2` asks for `^13.0.6` | **one major outside it** |
+| `glob: ^14.0.2` | `jest-config@30.5.2` asks for `^13.0.6` | **one major outside it** |
+| `glob: ^14.0.2` | `jest-runtime@30.5.2` asks for `^13.0.6` | **one major outside it** |
+| `glob: ^14.0.2` | `@vercel/nft@1.11.1` asks for `^13.0.0` | **one major outside it** |
+| `glob: ^14.0.2` | `test-exclude@7.0.2` asks for `^10.4.1` | **four majors outside it** |
+| `minimatch@10: ^11.0.1` | `test-exclude@7.0.2` asks for `^10.2.2` | **one major outside it** |
+| `minimatch@10: ^11.0.1` | `readdir-glob@3.0.0` asks for `^10.2.2` | **one major outside it** |
+| `graphql-middleware` &rarr; `@graphql-tools/delegate: ^12.2.1` | `graphql-middleware@6.1.35` asks for `^8.8.1` | **four majors outside it** |
+| `graphql-middleware` &rarr; `@graphql-tools/schema: ^10.1.5` | `graphql-middleware@6.1.35` asks for `^8.5.1` | **two majors outside it** |
 | `uuid: ^11.1.1` | `sequelize@6.37.8` asks for `^8.3.2` | **three majors outside it** |
 
-The first two raise a package within the major line its dependant
-declared, which is what an override is for.
+Each was taken deliberately, and for the same reason: the advisory is
+fixed in the newer major and in no release inside the dependant's range,
+so `npm audit` had no in-range version to move to.
 
-The third does not, and it was taken deliberately. The advisory against
-`uuid` is fixed in 11.1.1 and in no 8.x release, so there is no
-in-range version to move to — `npm audit` reported it as having no fix
-available. What makes it safe here is that `uuid` 11 still ships a CJS
-entry, so `sequelize`'s `require('uuid')` resolves, and that `sequelize`
-is a devDependency of a package whose `dependencies` are empty and
-whose published files are `config/` and `lib/`. Nothing this
-package ships reaches it.
+| Package | Advisory | Fixed in |
+|---|---|---|
+| `glob` | `GHSA-3g3m-2fjr-6pw4` | 14.0.2 |
+| `minimatch` | `GHSA-g3hv-75wg-m249` | 11.0.1 |
+| `@graphql-tools/utils` | `GHSA-7mx3-vvmw-hjmv` | 12.0.1 |
 
-**Check this override again whenever `sequelize` moves.** A range
-violation holds only as long as the code behind it does not change, and
-nothing in npm will report when that stops being true.
+`@graphql-tools/utils` takes no entry of its own. Version 8 of
+`@graphql-tools/delegate` and of `@graphql-tools/schema` pins it at
+exactly `8.9.0`, so raising those two is what brings the patched copy in.
+
+The `minimatch` entry is held to the 10.x copies. The 3.x copy that
+`eslint` asks for is outside the advisory, and `minimatch` 11 has no
+default export, which the ESM entry of `@eslint/config-array` imports.
+
+What makes each of them safe here differs.
+
+- **`glob` and `minimatch`** 10 are reached through `jest` and the build
+  tooling of `nuxt`. `npm test -- --coverage` passes with both overrides
+  in place, and nothing in this repository runs `nuxt`.
+- **`graphql-middleware`** arrives through `@openreachtech/renchan`, which
+  is installed here to be read by `/scribe` and is never run.
+- **`uuid`** 11 still ships a CJS entry, so `sequelize`'s
+  `require('uuid')` resolves.
+
+All of them sit under devDependencies of a package whose `dependencies`
+are empty and whose published files are `config/` and `lib/`. Nothing
+this package ships reaches them.
+
+**Check these overrides again whenever `jest`, `nuxt`,
+`@openreachtech/renchan` or `sequelize` moves.** A range violation holds
+only as long as the code behind it does not change, and nothing in npm
+will report when that stops being true.
 
 ## Language mirror
 
