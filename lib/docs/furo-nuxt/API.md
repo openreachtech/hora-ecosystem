@@ -1,279 +1,278 @@
 # API
 
-Source: no `.d.ts` shipped for the export surface (`package.json` has no `"types"` field; `types/furo-nuxt.d.ts` only augments the global `furo` namespace with a few shared type aliases and is not a description of this package's exports). Extracted from JSDoc in `lib/**/*.js`.
+Package: `@openreachtech/furo-nuxt` 3.0.0. The package ships no `.d.ts` for its exports (`package.json` has no `"types"` field), so this document is extracted from the JSDoc in `lib/**/*.js`. `types/furo-nuxt.d.ts` only declares shared aliases in the global `furo` namespace (see the last section).
 
-No members are tagged `@public` across most of the package; `BaseFormClerk` does tag a subset of its methods `@public`. Elsewhere, the surface below is the natural consumer-facing API — i.e. what a Nuxt app is expected to call from components/pages/plugins, as opposed to internal helpers used only by the class itself.
+The package is ESM (`"type": "module"`) and has no default export. Every name below is a named export of `index.js`, except the two composables marked "not exported".
 
-## Exports (`index.js`)
+## Notation
 
-`furo-nuxt` re-exports plain functions (Vue composables), classes, and one factory function. There is no default export from the package itself — every export below is named.
+Class members use this notation. A leading `#` marks an instance member, and it does not mean a JavaScript private field. Every member listed is public.
+
+- `#name` is an instance property, `#name()` an instance method, and `#get:name` an instance getter.
+- `.name` is a static property, `.name()` a static method, and `.get:name` a static getter.
+- `.create(params)` is the static factory of every class. It runs `new this(params)`, so subclasses inherit it. Prefer `create()` over `new`.
+- `?` marks an optional property. `= x` marks a default value.
+- A getter marked **abstract** returns a placeholder on the base class. A subclass must override it.
+
+## Exports of `index.js` (15)
 
 Composables:
 
-- `useFormClerk` ← `lib/composables/useFormClerk.js`
-- `useGraphqlClient` ← `lib/composables/useGraphqlClient.js`
-- `useFuroSetup` ← `lib/composables/useFuroSetup.js`
-- `useSubscriptionConnector` ← `lib/composables/useSubscriptionConnector.js`
-
-Not exported from `index.js` (present in `lib/composables/` but commented out, because they import from `nuxt/app` and cannot be Jest-tested): `useSubscriptionGraphqlClient`, `useRedirect`. They are documented below anyway since they ship in the package and can be imported by their file path.
+- `useFormClerk`
+- `useGraphqlClient`
+- `useFuroSetup`
+- `useSubscriptionConnector`
 
 Vue helper:
 
-- `buildDefineComponent` ← `lib/vue/buildDefineComponent.js`
+- `buildDefineComponent`
 
 Tools:
 
-- `NuxtFuroEnvLoader` ← `lib/tools/NuxtFuroEnvLoader.js`
-- `AccessTokenClerk` ← `lib/tools/AccessTokenClerk.js`
-- `FuroMeta` ← `lib/tools/FuroMeta.js`
+- `NuxtFuroEnvLoader`
+- `AccessTokenClerk`
+- `FuroMeta`
 
-DOM Clerks:
+Form clerk:
 
-- `BaseFormClerk` ← `lib/clerks/BaseFormClerk.js`
+- `BaseFormClerk`
 
-Furo Context (per-component "presenter" objects passed to Vue `setup()`):
+Furo context:
 
-- `BaseFuroContext` ← `lib/contexts/BaseFuroContext.js`
-- `BaseFuroContextAccessor` ← `lib/contexts/BaseFuroContextAccessor.js`
+- `BaseFuroContext`
+- `BaseFuroContextAccessor`
 
-The package ships **no concrete context subclasses**. `lib/contexts/concretes/` does not exist, and an application defines its own subclasses of `BaseFuroContext`.
+Furo share:
 
-Furo Share (app-wide singletons, typically installed as `$furo` in a Nuxt plugin):
-
-- `FuroShare` ← `lib/shares/FuroShare.js`
-- `FuroGraphqlShare` ← `lib/shares/FuroGraphqlShare.js`
+- `FuroShare`
+- `FuroGraphqlShare`
 
 RESTful API:
 
-- `RestfulApiClient` ← `lib/clients/RestfulApiClient.js`
-- `BaseRestfulApiSubmitter` ← `lib/submitters/BaseRestfulApiSubmitter.js`
+- `RestfulApiClient`
+- `BaseRestfulApiSubmitter`
 
-Class members are written with the following notation throughout this document.
-
-| notation | members |
-| :-- | :-- |
-| `#instanceProperty` | instance property |
-| `#instanceMethod()` | instance method |
-| `#get:instanceGetter` | instance getter |
-| `.staticProperty` | static property |
-| `.staticMethod()` | static method |
-| `.get:staticGetter` | static getter |
+Not exported from `index.js` (the export lines are commented out because the files import `nuxt/app`): `useSubscriptionGraphqlClient` and `useRedirect`. They ship in `lib/composables/` and are documented below for reference.
 
 ## Composable: `useFormClerk({ FormElementClerk, invokeRequestWithFormValueHash })`
 
-Wires a `furo` `BaseFormElementClerk` subclass to a request-invoking function, for use inside a Vue `setup()`.
+Wires a `furo` `BaseFormElementClerk` subclass to a request function. Call it inside a Vue `setup()`.
 
-- `FormElementClerk` — a `furo` `BaseFormElementClerk` subclass (constructor, not instance).
-- `invokeRequestWithFormValueHash({ valueHash, extraValueHash?, hooks?, options? })` — async function called with the extracted form value hash once validation passes (typically `useGraphqlClient(...).invokeRequestWithFormValueHash`).
-
-Returns `{ validationRef, submitForm }`:
-
-- `validationRef` — a Vue `Ref` initialized to `{ valid: {}, invalid: {}, messages: {}, message: {} }`, updated on every `submitForm()` call.
-- `submitForm({ formElement, extraValueHash?, hooks?, options? })` — async. Builds a `FormElementClerk` instance from `formElement`, writes its validation hash into `validationRef`, and returns `false` without calling `invokeRequestWithFormValueHash` if the form is invalid. Otherwise extracts the value hash, calls `invokeRequestWithFormValueHash`, and returns `true`.
+- `FormElementClerk` is a `BaseFormElementClerk` subclass from `@openreachtech/furo` (the constructor, not an instance). It must offer `.create({ formElement })`, and its instances must offer `generateValidationHash()`, `isInvalid()` and `extractValueHash()`.
+- `invokeRequestWithFormValueHash({ valueHash, extraValueHash?, hooks?, options? })` is an async function called with the form value hash once validation passes. Typically it is the same-named function returned by `useGraphqlClient()`.
+- Returns `{ validationRef, submitForm }`.
+- `validationRef` is a Vue `Ref` initialized to `{ valid: {}, invalid: {}, messages: {}, message: {} }`.
+- `submitForm({ formElement, extraValueHash? = {}, hooks?, options? })` is async and returns `Promise<boolean>`. It builds `FormElementClerk.create({ formElement })` and writes `generateValidationHash()` into `validationRef.value`. When the form is invalid it returns `false` without calling the request function. Otherwise it calls `invokeRequestWithFormValueHash({ valueHash, extraValueHash, hooks, options })` with the extracted value hash and returns `true`.
 
 ## Composable: `useGraphqlClient({ Launcher })`
 
-Wires a `furo` GraphQL `Launcher` to a reactive capsule, for use inside a Vue `setup()`.
+Wires a `furo` GraphQL launcher to a reactive capsule. Call it inside a Vue `setup()`.
 
-- `Launcher` — a `furo`/GraphQL launcher constructor exposing `.createCapsuleAsPending()`, `.createPayload()`, `.createPayloadWithFormValueHash()`, `.create()`.
-
-Returns `{ capsuleRef, invokeRequestOnEvent, invokeRequestOnMounted, invokeRequestWithFormValueHash }`:
-
-- `capsuleRef` — a Vue `Ref` initialized via `Launcher.createCapsuleAsPending()`, replaced with the response capsule after each request.
-- `invokeRequestOnEvent(args?)` — async. `args: { variables?, options?, hooks? }`. Runs the request immediately and writes the result into `capsuleRef`.
-- `invokeRequestOnMounted(args?)` — same as above but deferred inside Vue's `onMounted()`.
-- `invokeRequestWithFormValueHash({ valueHash, extraValueHash?, options?, hooks? })` — async. Builds the payload from a form value hash via `Launcher.createPayloadWithFormValueHash()` instead of `variables`.
+- `Launcher` is a GraphQL launcher constructor. It must offer `.createCapsuleAsPending()`, `.createPayload({ variables, options })`, `.createPayloadWithFormValueHash({ valueHash, extraValueHash, options })` and `.create()`. The JSDoc also lists a `Capsule` parameter, but only `Launcher` is read at runtime.
+- Returns `{ capsuleRef, invokeRequestOnEvent, invokeRequestOnMounted, invokeRequestWithFormValueHash }`.
+- `capsuleRef` is a Vue `Ref` initialized with `Launcher.createCapsuleAsPending()` and replaced with the response capsule after each request.
+- `invokeRequestOnEvent(args?)` is async. `args` is `{ variables? = {}, options? = {}, hooks? = {} }`. It sends the request now and stores the capsule in `capsuleRef`.
+- `invokeRequestOnMounted(args?)` takes the same `args`, returns `void`, and registers the request inside Vue's `onMounted()`.
+- `invokeRequestWithFormValueHash({ valueHash, extraValueHash? = {}, options? = {}, hooks? = {} })` is async. It builds the payload from the form value hash instead of `variables`.
 
 ## Composable: `useFuroSetup({ STORAGE_KEY })`
 
-App-bootstrap composable that persists the Nuxt public runtime config into session storage so it is reachable outside of the Nuxt context (e.g. by plain `furo` classes).
+Persists the Nuxt public runtime config into session storage, so plain `furo` classes can read it outside the Nuxt context.
 
-- `STORAGE_KEY` — a hash of storage keys; must contain a `FURO_ENV` key.
-
-Returns `{ setupFuroEnv }`:
-
-- `setupFuroEnv({ runtimeConfig })` — creates a `furo` `StorageClerk` (`.createAsSession()`) and `JSON.stringify`s `runtimeConfig.public` into it under `STORAGE_KEY.FURO_ENV`. No return value.
+- `STORAGE_KEY` is a `Record<string, string>` that must contain a `FURO_ENV` key.
+- Returns `{ setupFuroEnv }`.
+- `setupFuroEnv({ runtimeConfig })` stores `JSON.stringify(runtimeConfig.public)` under `STORAGE_KEY.FURO_ENV` through `StorageClerk.createAsSession()`. It returns `void`.
 
 ## Composable: `useSubscriptionConnector({ graphqlConfig })`
 
-Creates a `furo` `SubscriptionConnector` (WebSocket) from a GraphQL config, for use in a Nuxt plugin. Returns `{ subscriptionConnector }`.
+Creates a WebSocket `SubscriptionConnector` from `@openreachtech/furo`. The JSDoc says it is used in a Nuxt plugin that sets up GraphQL.
+
+- `graphqlConfig` is a `furo.GraphqlConfig` (`{ ENDPOINT_URL, WEBSOCKET_URL }`), passed as `SubscriptionConnector.create({ config: graphqlConfig })`.
+- Returns `{ subscriptionConnector }`, a `furo.Connector`. Pass it to `FuroGraphqlShare.create({ config, websocketConnector })`.
 
 ## Composable: `useSubscriptionGraphqlClient({ Subscriber, Capsule })`
 
-*Not exported from `index.js`* (imports `nuxt/app`); import from its file path directly if needed. Wires a `furo` GraphQL `Subscriber` (WebSocket subscription) to a reactive capsule. Reads `$furo` off `useNuxtApp()` and creates the subscriber against `$furo.websocketConnector`.
+Not exported from `index.js` (imports `nuxt/app`). Wires a GraphQL subscriber to a reactive capsule. It reads `$furo` from `useNuxtApp()` and creates `Subscriber.create({ connector: $furo.websocketConnector })`, so a `FuroShare` instance must be installed as `$furo`.
 
-Returns `{ capsuleRef, invokeSubscribe, invokeUnsubscribe }`:
+- `Subscriber` is a GraphQL subscriber constructor. It must offer `.create({ connector })` and `.createPayloadWithValueHash({ valueHash, operationName, extensions, context })`. Its instances must offer `subscribe({ payload, hooks })` and `unsubscribe()`.
+- `Capsule` is a subscription capsule constructor that must offer `.createAsPending()`.
+- Returns `{ capsuleRef, invokeSubscribe, invokeUnsubscribe }`.
+- `capsuleRef` is a Vue `Ref` initialized with `Capsule.createAsPending()`.
+- `invokeSubscribe({ hooks, valueHash? = {}, operationName? = null, extensions? = {}, context? = {} })` is async. `hooks.onPublish(capsule)` is required. `hooks.onDisconnected` and `hooks.onTerminate` are optional. Each published capsule is written into `capsuleRef` before `hooks.onPublish` runs. `context` is `{ headers?: HeadersInit, [key]: unknown }`.
+- `invokeUnsubscribe()` returns `void`. It unsubscribes and resets `capsuleRef` to `Capsule.createAsPending()`.
 
-- `capsuleRef` — a Vue `Ref` initialized via `Capsule.createAsPending()`.
-- `invokeSubscribe({ hooks, valueHash?, operationName?, extensions?, context? })` — async. Subscribes and writes each published capsule into `capsuleRef`, then calls `hooks.onPublish(capsule)`. Also forwards `hooks.onDisconnected` / `hooks.onTerminate` if provided.
-- `invokeUnsubscribe()` — unsubscribes and resets `capsuleRef` back to `Capsule.createAsPending()`.
+## Composable: `useRedirect({ defaultPath? = '/' } = {})`
 
-## Composable: `useRedirect({ defaultPath = '/' } = {})`
+Not exported from `index.js` (imports `nuxt/app` and `vue-router`). Reads the `redirect` query parameter of the current route.
 
-*Not exported from `index.js`* (imports `nuxt/app`); import from its file path directly if needed. Reads a `redirect` query parameter off the current route (via `vue-router`'s `useRoute()`) and redirects to it, falling back to `defaultPath`.
-
-Returns `{ redirectTo }`:
-
-- `redirectTo({ path } = {})` — async. `path` defaults to the resolved redirect path (`route.query.redirect`, first entry if an array, else `defaultPath`). Calls Nuxt's `navigateTo(path)`.
+- Returns `{ redirectTo }`.
+- `redirectTo({ path? } = {})` is async. `path` defaults to `route.query.redirect` (the first entry when it is an array), or `defaultPath` when the query is absent. It calls Nuxt's `navigateTo(path)`.
 
 ## Function: `buildDefineComponent({ options })`
 
-- `options: Array<ComponentOptions>` — a list of partial Vue component option objects, each optionally containing a `setup` function.
-- Returns a `defineComponent`-shaped function. When called with `{ setup, ...restOptions }`, it merges `setup` together with every `options[].setup` into one integrated `setup()` that calls all of them and shallow-merges their returned objects, then calls Vue's real `defineComponent()` with `restOptions` plus the integrated `setup`.
-- Used to compose multiple concerns (e.g. multiple contexts/mixins) into a single component's `setup()`.
+Builds a replacement for Vue's `defineComponent` that merges extra `setup` functions into every component.
+
+- `options` is `Array<import('vue').ComponentOptions>`. Each entry may have a `setup` function.
+- Returns a function typed as `typeof defineComponent`. Call it with the usual component options, including an optional `setup`.
+- The returned function runs every `options[].setup` first, then the component's own `setup`, each as `setup(props, context)`. It shallow-merges the returned objects into one (later keys win) and passes the result to Vue's `defineComponent()` together with the remaining component options.
 
 ## Class: `NuxtFuroEnvLoader`
 
-Loads a furo environment file with `dotenv`, choosing the file by `NODE_ENV`.
+Loads a `.furo-env` file with `dotenv`. It runs in Node (for example in `nuxt.config`), not in the browser.
 
-- `.create({ processEnv = process.env } = {})` — factory. Returns an instance.
-- `.get:dotenv` — the `dotenv` module.
-- `#processEnv` — the process environment hash the instance reads `NODE_ENV` from.
-- `#get:Ctor` — the constructor of the instance.
-- `#loadEnv()` — parses the resolved file and returns its key/value hash. Returns `{}` when the file is missing or `dotenv` throws.
-- `#resolveFilePath()` — `path.join(process.cwd(), <resolved file name>)`.
-- `#resolveFileName()` — the base name when `NODE_ENV` is `production`, otherwise the base name suffixed with `.<NODE_ENV>`.
-- `#resolveNodeEnv()` — `processEnv.NODE_ENV`, defaulting to `'development'`.
+- `.create({ processEnv? = process.env } = {})` returns an instance object.
+- `.get:dotenv` returns the `dotenv` module.
+- `#processEnv` is the environment hash that supplies `NODE_ENV`.
+- `#get:Ctor` returns the constructor of the instance object.
+- `#loadEnv()` loads the resolved file and returns its parsed key/value hash. It returns `{}` when nothing is parsed or `dotenv` throws.
+- `#resolveFilePath()` returns `path.join(process.cwd(), <file name>)`.
+- `#resolveFileName()` returns `.furo-env` when `NODE_ENV` is `production`, otherwise `.furo-env.<NODE_ENV>`.
+- `#resolveNodeEnv()` returns `processEnv.NODE_ENV`, or `'development'` when unset.
+
+Typedefs: `NuxtFuroEnvLoaderParams` (`{ processEnv: NodeJS.ProcessEnv }`) and `NuxtFuroEnvLoaderFactoryParams` (`{ processEnv?: NodeJS.ProcessEnv }`).
 
 ## Class: `AccessTokenClerk`
 
-Reads and writes an access token through a `furo` `StorageClerk` (local storage by default).
+Stores an access token in a `furo` `StorageClerk`.
 
-- `.create({ storage = <StorageClerk.createAsLocal()>, key = <.STORAGE_KEY> } = {})` — factory.
-- `.createStorageClerk()` — `StorageClerk.createAsLocal()`.
-- `.get:STORAGE_KEY` — `'access_token'`.
-- `#storage` — the storage clerk.
-- `#key` — the storage key.
-- `#saveToken({ token })` — clears and returns `false` when `token` is falsy; otherwise records it and returns `true`.
-- `#clearToken()` — removes the key. Returns `this`.
-- `#recordToken({ token })` — writes the token. Returns `this`.
-- `#retrieveToken()` — returns the stored token or `null`.
-- `#existsToken()` — `true` when `#retrieveToken()` is not `null`.
+- `.create({ storage? = AccessTokenClerk.createStorageClerk(), key? = AccessTokenClerk.STORAGE_KEY } = {})` returns an instance object.
+- `.createStorageClerk()` returns `StorageClerk.createAsLocal()`.
+- `.get:STORAGE_KEY` returns `'access_token'`.
+- `#storage` is the storage clerk. `#key` is the storage key.
+- `#saveToken({ token })` takes `string | null`. A falsy token clears the stored value and returns `false`. Otherwise it records the token and returns `true`.
+- `#clearToken()` removes the key and returns the instance object.
+- `#recordToken({ token })` writes the token and returns the instance object.
+- `#retrieveToken()` returns `string | null`.
+- `#existsToken()` returns `true` when `retrieveToken()` is not `null`.
+
+Typedefs: `AccessTokenClerkParams` (`{ storage: StorageClerk, key: string }`) and `AccessTokenClerkFactoryParams` (`{ storage?: StorageClerk, key?: string }`).
 
 ## Class: `FuroMeta`
 
-Reads the `$furo` meta hash off a Nuxt route, for use in route middleware.
+Reads the `$furo` meta hash of a Nuxt route. Use it in route middleware.
 
-- `.create({ routeTo })` — factory. Extracts the meta hash from the route first.
-- `.extractFuroMetaFromRoute({ routeTo })` — `routeTo.meta.$furo`, defaulting to `{}`.
-- `#furo` — the extracted meta hash (`{ pageTitle?, skipFilter? }`).
-- `#get:pageTitle` — `furo.pageTitle`, defaulting to `null`.
-- `#get:skipFilter` — `furo.skipFilter`, defaulting to `false`.
+- `.create({ routeTo })` takes the `to` route of a Nuxt `RouteMiddleware` and returns an instance object.
+- `.extractFuroMetaFromRoute({ routeTo })` returns `routeTo.meta.$furo`, or `{}` when absent.
+- `#furo` is the meta hash `{ pageTitle?: string, skipFilter?: boolean }`.
+- `#get:pageTitle` returns `furo.pageTitle`, or `null`.
+- `#get:skipFilter` returns `furo.skipFilter`, or `false`.
+
+The constructor takes `{ furo: { pageTitle?: string, skipFilter?: boolean } }`. `.create()` builds it from the route.
 
 ## Class: `BaseFormClerk`
 
-Orchestrates a `furo` `FormElementInspector` and `ValueHashValidator` against a `<form>` element held in a Vue shallow ref. Intended to be subclassed, overriding `.get:validationRules`.
+Orchestrates a `furo` `FormElementInspector` and `ValueHashValidator` for a `<form>` element held in a Vue shallow ref. Subclass it and override `.get:validationRules`. Generic parameter: `FV` (form value hash type).
 
-- `.create({ formElementShallowRef = <.createFormElementShallowRef()>, validationRef = <.createValidationRef()> } = {})` — factory.
-- `.get:ref` / `.get:shallowRef` — Vue's `ref` / `shallowRef`, exposed as seams for testing.
-- `.get:validationRules` — **abstract**; returns `[]` on the base class. A subclass returns an array of `furo.FieldValidatorFactoryParams`.
-- `.createFormElementShallowRef()` — `shallowRef(null)`.
-- `.createValidationRef()` — `ref({ valid: {}, invalid: {}, messages: {}, message: {} })`.
-- `#formElementShallowRef` — the `<form>` element ref.
-- `#validationRef` — the validation hash ref, replaced on every `#validateFormValueHash()` call.
-- `#get:Ctor` — the constructor of the instance.
-- `#validateFormValueHash({ valueHash = <#extractValueHash()> } = {})` — `@public`. Validates against `.get:validationRules`, writes the result into `#validationRef`, and returns whether it is valid.
-- `#isValid({ validationHash = <#validationRef.value> } = {})` — `@public`. `true` when every entry of `validationHash.valid` is truthy.
-- `#isInvalid({ validationHash } = {})` — `@public`. Negation of `#isValid()`.
-- `#extractValueHash()` — `@public`. Returns the form control value hash via `FormElementInspector`.
-- `#createFormElementInspector()` — throws `Error('no mounted form element')` when the shallow ref holds no element.
+- `.create({ formElementShallowRef? = this.createFormElementShallowRef(), validationRef? = this.createValidationRef() } = {})` returns an instance object.
+- `.get:ref` returns Vue's `ref`. `BaseFormClerk.get:shallowRef` returns Vue's `shallowRef`.
+- `.get:validationRules` is **abstract** and returns `[]`. A subclass returns `Array<furo.FieldValidatorFactoryParams>`.
+- `.createFormElementShallowRef()` returns `shallowRef(null)`, typed `Ref<HTMLFormElement | null>`.
+- `.createValidationRef()` returns `ref({ valid: {}, invalid: {}, messages: {}, message: {} })`.
+- `#formElementShallowRef` is the ref that must receive the mounted `<form>` element (bind it as a template ref).
+- `#validationRef` is the validation hash ref. `validateFormValueHash()` replaces its value.
+- `#get:Ctor` returns the constructor of the instance object.
+- `#validateFormValueHash({ valueHash? = #extractValueHash() } = {})` is tagged `@public`. It validates against `Ctor.validationRules`, writes the result into `validationRef.value`, and returns `true` when valid.
+- `#isValid({ validationHash? = validationRef.value } = {})` is tagged `@public`. It returns `true` when every value in `validationHash.valid` is truthy.
+- `#isInvalid({ validationHash? = validationRef.value } = {})` is tagged `@public`. It returns the negation of `isValid()`.
+- `#extractValueHash()` is tagged `@public`. It returns the form control value hash (type `FV`).
+- `#createFormElementInspector()` returns a `FormElementInspector` for the held element. It throws `Error('no mounted form element')` when the shallow ref is empty.
+
+Typedefs: `BaseFormClerkParams` (`{ formElementShallowRef: ShallowRef<HTMLFormElement | null>, validationRef: Ref<furo.ValidatorHashType> }`) and `BaseFormClerkFactoryParams` (`Partial<BaseFormClerkParams>`).
 
 ## Class: `BaseFuroContext`
 
-The per-component "presenter" object handed to a Vue `setup()`. Intended to be subclassed.
+The per-component context object created from a Vue `setup()`. Subclass it. Generic parameters: `A` (context accessor class, default `null`), `P` (props, default `{}`), `EE` (emit event names, default `null`).
 
-- `.create({ props, componentContext })` — factory.
-- `.get:ContextAccessor` — the `BaseFuroContextAccessor` subclass paired with this context, or `null` (the base class returns `null`).
-- `.get:EMIT_EVENT_NAME` — **abstract**; returns `{}` on the base class. A subclass returns a hash of `emit()` event names.
-- `.createMutationObserver({ handler })` — `new MutationObserver(handler)`.
-- `#props` — the component props.
-- `#componentContext` — the Vue `SetupContext`.
-- `#accessor` — the context accessor instance, built in the constructor.
-- `#get:Ctor` — the constructor of the instance.
-- `#createContextAccessor()` — returns `null` when `.get:ContextAccessor` is `null`, else `ContextAccessor.create({ context: this })`.
-- `#get:$` — the context accessor instance (shorthand for `#accessor`).
-- `#get:EMIT_EVENT_NAME` — delegates to `.get:EMIT_EVENT_NAME`.
-- `#get:attrs` / `#get:slots` / `#get:emit` / `#get:expose` — the matching members of the Vue `SetupContext`.
-- `#get:watch` — Vue's `watch`.
-- `#setupComponent(args = {})` — hook for subclasses; returns `this` for chaining. The base implementation does nothing.
-- `#generateExposeHash()` — hook for subclasses; returns `{}` on the base class.
+- `.create({ props, componentContext })` returns an instance object. `componentContext` is the Vue `SetupContext`.
+- `.get:ContextAccessor` returns `null` on the base class. A subclass returns its `BaseFuroContextAccessor` subclass.
+- `.get:EMIT_EVENT_NAME` is **abstract** and returns `{}`. A subclass returns a `Record<string, string>` of `emit()` event names.
+- `.createMutationObserver({ handler })` returns `new MutationObserver(handler)`.
+- `#props` holds the component props. `#componentContext` holds the `SetupContext`.
+- `#accessor` is the result of `createContextAccessor()`, built in the constructor.
+- `#get:Ctor` returns the constructor of the instance object.
+- `#createContextAccessor()` returns `null` when `Ctor.ContextAccessor` is `null`, otherwise `Ctor.ContextAccessor.create({ context: this })`.
+- `#get:$` returns `accessor` (the accessor instance).
+- `#get:EMIT_EVENT_NAME` returns `Ctor.EMIT_EVENT_NAME`.
+- `#get:attrs`, `#get:slots`, `#get:emit` and `#get:expose` return the same-named member of `componentContext`.
+- `#get:watch` returns Vue's `watch`.
+- `#setupComponent(args = {})` is a hook for subclasses. The base version does nothing and returns `this` for chaining. A subclass override typically calls `this.expose(this.generateExposeHash())`, registers `watch` handlers, and returns `this`.
+- `#generateExposeHash()` returns `{}` on the base class. A subclass returns a `Record<string, Function>` for `expose()`.
 
-Typedefs: `BaseFuroContextParams<P>` and `BaseFuroContextFactoryParams<P>`, both `{ props: P, componentContext: SetupContext }`.
+Typedefs: `BaseFuroContextParams<P>` (`{ props: P, componentContext: SetupContext }`, where `P` extends `ComponentCustomProps | {}` and defaults to `{}`) and `BaseFuroContextFactoryParams<P>` (an alias of `BaseFuroContextParams<P>`).
 
 ## Class: `BaseFuroContextAccessor`
 
-A thin wrapper giving a template restricted access to a context.
+A base class for the accessor object that gives templates access to a context. Subclass it and return the subclass from the static getter `.get:ContextAccessor` of `BaseFuroContext`. Generic parameter: `C` (the context type).
 
-- `.create({ context })` — factory.
-- `#context` — the `BaseFuroContext` instance it wraps.
+- `.create({ context })` returns an instance object.
+- `#context` is the wrapped `BaseFuroContext` instance object.
 
-Typedefs: `BaseFuroContextAccessorParams<C>` (`{ context: C }`) and `BaseFuroContextAccessorFactoryParams`.
+Typedefs: `BaseFuroContextAccessorParams<C>` (`{ context: C }`) and `BaseFuroContextAccessorFactoryParams` (an alias of `BaseFuroContextAccessorParams<*>`).
 
 ## Class: `FuroShare`
 
-App-wide singleton, typically installed as `$furo` in a Nuxt plugin.
+The app-wide share object, typically installed as `$furo` in a Nuxt plugin.
 
-- `.create({ graphqlShare })` — factory.
-- `#graphqlShare` — the `FuroGraphqlShare` instance.
-- `#get:graphqlConfig` — `graphqlShare.config`.
-- `#get:websocketConnector` — `graphqlShare.websocketConnector`.
+- `.create({ graphqlShare })` returns an instance object.
+- `#graphqlShare` is the `FuroGraphqlShare` instance object.
+- `#get:graphqlConfig` returns `graphqlShare.config`.
+- `#get:websocketConnector` returns `graphqlShare.websocketConnector`.
 
-Typedefs: `FuroShareParams` (`{ graphqlShare: furo.GraphqlShare }`) and `FuroShareFactoryParams`.
+Typedefs: `FuroShareParams` (`{ graphqlShare: furo.GraphqlShare }`) and `FuroShareFactoryParams` (an alias of `FuroShareParams`).
 
 ## Class: `FuroGraphqlShare`
 
-The GraphQL half of the app-wide share.
+The GraphQL part of the share.
 
-- `.create({ config, websocketConnector })` — factory.
-- `#config` — the `furo.GraphqlConfig`.
-- `#websocketConnector` — the `furo.Connector` used for subscriptions.
+- `.create({ config, websocketConnector })` returns an instance object.
+- `#config` is a `furo.GraphqlConfig`.
+- `#websocketConnector` is a `furo.Connector` used for subscriptions.
 
-Typedefs: `FuroGraphqlShareParams` (`{ config, websocketConnector }`) and `FuroGraphqlShareFactoryParams`.
+Typedefs: `FuroGraphqlShareParams` (`{ config: furo.GraphqlConfig, websocketConnector: furo.Connector }`) and `FuroGraphqlShareFactoryParams` (an alias of `FuroGraphqlShareParams`).
 
 ## Class: `RestfulApiClient`
 
-Wires a `furo` RESTful API `Launcher` to a reactive capsule. Unlike the GraphQL side, this is a class rather than a composable.
+Wires a `furo` RESTful API launcher to a reactive capsule. Unlike the GraphQL side, this is a class. Generic parameter: `C` (capsule constructor type).
 
-- `.create({ Launcher })` — factory. Builds `capsuleRef` via `.generateCapsuleRef()`.
-- `.generateCapsuleRef({ Launcher })` — `ref(Launcher.createCapsuleAsPending())`.
-- `.get:onMounted` / `.get:ref` — Vue's `onMounted` / `ref`, exposed as seams for testing.
-- `#Launcher` — the launcher constructor.
-- `#capsuleRef` — the capsule ref, replaced after each request.
-- `#get:Ctor` — the constructor of the instance.
-- `#invokeRequestOnEvent({ query?, body?, pathParameterHash?, options?, hooks? } = {})` — async. Delegates to `#invokeRequest()`.
-- `#invokeRequestOnMounted({ ... } = {})` — same arguments, deferred inside `onMounted()`.
-- `#invokeRequestWithFormValueHash({ valueHash, extraValueHash?, options?, hooks? })` — async. Builds the payload via `Launcher.createPayloadWithFormValueHash()`.
-- `#invokeRequest({ query?, body?, pathParameterHash?, options?, hooks? } = {})` — async. Builds the payload via `Launcher.createPayload()` and writes the capsule into `#capsuleRef`.
-- `#retrieveCapsule({ payload, hooks? })` — async. Runs `Launcher.create().launchRequest()` and returns the capsule.
+- `.create({ Launcher })` returns an instance object. It builds `capsuleRef` with `RestfulApiClient.generateCapsuleRef({ Launcher })`. The `RestfulApiClientFactoryParams` typedef also lists `Capsule`, but only `Launcher` is read.
+- `.generateCapsuleRef({ Launcher })` returns `ref(Launcher.createCapsuleAsPending())`.
+- `.get:onMounted` returns Vue's `onMounted`. `RestfulApiClient.get:ref` returns Vue's `ref`.
+- `#Launcher` is the launcher constructor. It must offer `.createCapsuleAsPending()`, `.createPayload({ query, body, pathParameterHash, options })`, `.createPayloadWithFormValueHash({ valueHash, extraValueHash, options })` and `.create()`. Launcher instances must offer `launchRequest({ payload, hooks })`.
+- `#capsuleRef` is a Vue `Ref` holding the capsule. Each request replaces its value.
+- `#get:Ctor` returns the constructor of the instance object.
+- `#invokeRequestOnEvent({ query? = {}, body? = {}, pathParameterHash? = {}, options? = {}, hooks? = {} } = {})` is async. It calls `invokeRequest()` now.
+- `#invokeRequestOnMounted({ ...same properties } = {})` returns `void`. It registers the request inside Vue's `onMounted()`.
+- `#invokeRequestWithFormValueHash({ valueHash, extraValueHash? = {}, options? = {}, hooks? = {} })` is async. It builds the payload from the form value hash and stores the capsule in `capsuleRef`.
+- `#invokeRequest({ query?, body?, pathParameterHash?, options?, hooks? } = {})` is async. It builds the payload with `Launcher.createPayload()` and stores the capsule in `capsuleRef`.
+- `#retrieveCapsule({ payload, hooks? = {} })` is async. It runs `Launcher.create().launchRequest({ payload, hooks })` and returns the capsule without storing it.
 
-Typedefs: `RestfulApiClientParams<C>`, `RestfulApiClientFactoryParams<C>`, and `RestfulApiRequestParams` (`{ query?, body?, pathParameterHash?, options?, hooks? }`).
+Typedefs: `RestfulApiClientParams<C>` (`{ Launcher, capsuleRef }`), `RestfulApiClientFactoryParams<C>` (`{ Launcher, Capsule }`) and `RestfulApiRequestParams` (`{ query?, body?, pathParameterHash?, options?: RequestInit, hooks? }`).
 
 ## Class: `BaseRestfulApiSubmitter`
 
-Pairs a `BaseFormClerk` with a `RestfulApiClient` so a `<form>` submits to a RESTful endpoint. Intended to be subclassed, overriding the two abstract static getters.
+Pairs a `BaseFormClerk` with a `RestfulApiClient`, so a `<form>` submits to a RESTful endpoint. Subclass it and override the two abstract static getters. Generic parameter: `FV` (form value hash type).
 
-- `.create({ formClerk = <.createFormClerk()>, restfulApiClient = <.createRestfulApiClient()> } = {})` — factory.
-- `.createFormClerk()` — `FormClerkCtor.create()`.
-- `.createRestfulApiClient()` — `RestfulApiClient.create(RestfulApiLauncherCtor)`.
-- `.get:FormClerkCtor` — **abstract**; throws `Error('.get:FormClerkCtor must be inherited')`.
-- `.get:RestfulApiLauncherCtor` — **abstract**; throws `Error('.get:RestfulApiLauncherCtor must be inherited')`.
-- `#formClerk` — the form clerk instance.
-- `#restfulApiClient` — the RESTful API client instance.
-- `#get:formElementShallowRef` — delegates to `formClerk.formElementShallowRef`.
-- `#get:validationRef` — delegates to `formClerk.validationRef`.
-- `#get:capsuleRef` — delegates to `restfulApiClient.capsuleRef`.
-- `#submitForm({ extraValueHash?, hooks?, options?, submitEvent? })` — async. Extracts and validates the form value hash; returns `false` without a request when invalid. Otherwise calls `restfulApiClient.invokeRequestWithFormValueHash()` and returns `true`.
+- `.create({ formClerk? = this.createFormClerk(), restfulApiClient? = this.createRestfulApiClient() } = {})` returns an instance object.
+- `.createFormClerk()` returns `this.FormClerkCtor.create()`.
+- `.createRestfulApiClient()` returns `RestfulApiClient.create(this.RestfulApiLauncherCtor)`. It passes the launcher constructor itself as the only argument, while `RestfulApiClient.create()` destructures `{ Launcher }` from its argument, so `.create()` throws a `TypeError` unless the caller passes `restfulApiClient: RestfulApiClient.create({ Launcher })`.
+- `.get:FormClerkCtor` is **abstract**. The base version throws `Error('.get:FormClerkCtor must be inherited')`. A subclass returns a `BaseFormClerk` subclass.
+- `.get:RestfulApiLauncherCtor` is **abstract**. The base version throws `Error('.get:RestfulApiLauncherCtor must be inherited')`. A subclass returns a RESTful API launcher constructor.
+- `#formClerk` is the form clerk. `#restfulApiClient` is the RESTful API client.
+- `#get:formElementShallowRef` returns `formClerk.formElementShallowRef`.
+- `#get:validationRef` returns `formClerk.validationRef`.
+- `#get:capsuleRef` returns `restfulApiClient.capsuleRef`.
+- `#submitForm({ extraValueHash? = {}, hooks?, options?, submitEvent? })` is async and returns `Promise<boolean>`. The params object is required (pass `{}` when no option applies). It extracts the value hash with `formClerk.extractValueHash()` and validates it with `formClerk.validateFormValueHash()`. When invalid it returns `false` without a request. Otherwise it calls `restfulApiClient.invokeRequestWithFormValueHash({ valueHash, extraValueHash, hooks, options })` and returns `true`. `submitEvent` is accepted but the method body does not use it.
 
-Typedefs: `BaseRestfulApiSubmitterParams<FV>` and `BaseRestfulApiSubmitterFactoryParams<FV>`.
+Typedefs: `BaseRestfulApiSubmitterParams<FV>` (`{ formClerk: BaseFormClerk<FV>, restfulApiClient: RestfulApiClient }`) and `BaseRestfulApiSubmitterFactoryParams<FV>` (`Partial<BaseRestfulApiSubmitterParams<FV>>`).
 
 ## Global types (`types/furo-nuxt.d.ts`)
 
-Declared into the global `furo` namespace rather than exported from `index.js`.
+Declared in the global `furo` namespace, not exported from `index.js`.
 
-- `furo.GraphqlClient` — `{ capsuleRef, invokeRequestOnEvent, invokeRequestOnMounted, invokeRequestWithFormValueHash? }`.
-- `furo.FormClerk` — `{ validationRef, submitForm }`.
-- `furo.GraphqlConfig` — `{ ENDPOINT_URL: string, WEBSOCKET_URL: string }`.
-- `furo.Share` — alias of `FuroShare`.
-- `furo.GraphqlShare` — alias of `FuroGraphqlShare`.
+- `furo.GraphqlClient` is `{ capsuleRef, invokeRequestOnEvent, invokeRequestOnMounted, invokeRequestWithFormValueHash? }`, the shape returned by `useGraphqlClient()`.
+- `furo.FormClerk` is `{ validationRef, submitForm }`, the shape returned by `useFormClerk()`.
+- `furo.GraphqlConfig` is `{ ENDPOINT_URL: string, WEBSOCKET_URL: string }`.
+- `furo.Share` is an alias of `FuroShare`.
+- `furo.GraphqlShare` is an alias of `FuroGraphqlShare`.
 
-`types/jest.d.ts` also ships, and carries Jest matcher declarations for the package's own test suite rather than any consumer-facing type.
+`types/jest.d.ts` also ships. It declares Jest matchers for the package's own tests and is not a consumer-facing type.
