@@ -64,7 +64,7 @@
     "@openreachtech/renchan-job-bullmq": "^1.1.3",
     "@openreachtech/renchan-kafka": "^1.1.2",
     "@openreachtech/renchan-replica-fragments": "^1.6.1",
-    "@openreachtech/renchan-sequelize": "^2.2.2",
+    "@openreachtech/renchan-sequelize": "^2.3.0",
     "@types/jest": "^30.0.0",
     "eslint": "^9.39.5",
     "jest": "^30.5.1"
