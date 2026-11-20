@@ -38,7 +38,7 @@
     "@openreachtech/jest-constructor-spy": "^1.1.2",
     "@openreachtech/jest-deep-containing": "^1.0.2",
     "@openreachtech/jest-expect-each": "^1.0.3",
-    "@openreachtech/mentsu-bound-ctor-registry": "^1.0.3",
+    "@openreachtech/mentsu-bound-ctor-registry": "^1.0.4",
     "@openreachtech/mentsu-deep-loader": "^1.0.1",
     "@openreachtech/mentsu-deep-value-converter": "^1.0.1",
     "@openreachtech/mentsu-field-path-value-extractor": "^1.1.3",
