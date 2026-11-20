@@ -60,7 +60,7 @@
     "@openreachtech/renchan": "^2.13.2",
     "@openreachtech/renchan-elasticsearch": "^1.9.1",
     "@openreachtech/renchan-env": "^1.0.6",
-    "@openreachtech/renchan-funnel": "^1.1.2",
+    "@openreachtech/renchan-funnel": "^1.1.3",
     "@openreachtech/renchan-job-bullmq": "^1.1.3",
     "@openreachtech/renchan-kafka": "^1.1.2",
     "@openreachtech/renchan-replica-fragments": "^1.6.1",
