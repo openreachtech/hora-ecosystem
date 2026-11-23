@@ -10,49 +10,56 @@ Open Reach Techのエコシステムパッケージ群(`renchan-*` / `furo-*` / 
 
 ## インストール
 
-Node.js 20.0.0 以降が必要です(`package.json` の `engines` が宣言している下限)。CI は現行の LTS でビルドしています。
+Node.js 20.0.0 以降と npm 11.10.0 以降が必要です(`package.json` の `engines` が宣言している下限)。CI は現行の LTS でビルドしています。
 
 ```sh
 npm install @openreachtech/hora-ecosystem
 ```
 
-ES モジュール(`"type": "module"`)です。ESM の `import` 構文でインポートしてください。
-
 ## 使い方
 
 ### `config/lookup.js`
 
-追跡対象パッケージのホワイトリストです。各パッケージ名(`@openreachtech/` スコープを除いたもの)を、現在カタログ化されているかどうかにマッピングした、単純なオブジェクトです:
+カタログを生成するための台帳です。検討対象になったORTのリポジトリを、現在カタログ化されているかどうかにマッピングしています。
 
 ```js
-import TARGET_PACKAGES from '@openreachtech/hora-ecosystem/config/lookup.js'
-
-Object.entries(TARGET_PACKAGES)
-  .filter(([, isCatalogued]) => isCatalogued)
-  .map(([packageName]) => packageName)
-// -> ['mentsu-rootpath', 'renchan-env', ...]
+const TARGET_REPOSITORIES = {
+  'furo-core': true,
+  'mentsu-rootpath': true,
+  'renchan-core': true,
+  'renchan-tools-twilio': false,
+  // ...
+}
 ```
 
-値が`false`で存在するパッケージは、存在は認識しているものの意図的にカタログ対象から外されているもの(非推奨、または未決定など)です。このオブジェクトに全く現れないパッケージは、そもそも候補になったことがないものです。
+キーは**GitHubのリポジトリ名**から`openreachtech/`のオーナー部分を除いたものであり、npmのパッケージ名ではありません。リポジトリと公開名が異なる場合、両者は食い違います。
 
-### `lib/docs/<package-name>/`
+値が`false`のリポジトリは、存在は認識しているものの意図的にカタログ対象から外されているもの(非推奨、または未決定など)です。このオブジェクトに全く現れないリポジトリは、そもそも候補になったことがないものです。
 
-`config/lookup.js`で`true`になっているパッケージ名ごとに、このディレクトリには以下が置かれます:
+このファイルは、生成スキルが何を取得すべきかを知るために存在します。カタログの中身を知るには、下の`lib/docs/`を読んでください。
 
-- `README.md` — そのパッケージ自身のREADMEが存在する場合、その内容をそのまま複写したもの。
+### `lib/docs/`
+
+カタログの本体です。配下のディレクトリ1つがカタログ済みのパッケージ1つにあたるので、これを列挙すればカタログの中身が分かります。
+
+```
+lib/docs/
+├── furo/
+│   ├── README.md
+│   └── API.md
+├── mentsu-rootpath/
+│   ├── README.md
+│   └── API.md
+├── renchan/
+│   ├── README.md
+│   └── API.md
+└── ...
+```
+
+- `README.md` — そのパッケージ自身のREADMEをそのまま複写したもの。上流がREADMEを持たない場合は置かれません。
 - `API.md` — パッケージがexportするクラス・関数と、その public なメンバー・メソッド・シグネチャの要約(`.d.ts`またはJSDocから抽出)。
 
-```js
-import { readFile } from 'node:fs/promises'
-
-const apiReference = await readFile(
-  new URL(
-    '../node_modules/@openreachtech/hora-ecosystem/lib/docs/mentsu-rootpath/API.md',
-    import.meta.url
-  ),
-  'utf-8'
-)
-```
+ディレクトリ名は**npmのパッケージ名**から`@openreachtech/`スコープを除いたものです。`config/lookup.js`のキー(リポジトリ名)とは別物で、`furo-core`は`furo`として、`renchan-core`は`renchan`として公開されています。
 
 ## コントリビューション
 

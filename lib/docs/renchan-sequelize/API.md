@@ -4,7 +4,7 @@ Source: JSDoc across `lib/models/`, `lib/models/mixins/`, `lib/models/hookPayloa
 
 ## Exports (`index.js`)
 
-All exports are named (no default export from `index.js` itself). Two are CommonJS interop (`.cjs` files loaded via `module.createRequire`); the rest are ES module default exports re-exported by name:
+All exports are named (no default export from `index.js` itself). Two are CommonJS interop (`.cjs` files loaded via `createRequire` of `node:module`); the rest are ES module default exports re-exported by name:
 
 - `MigrationAttributeFactory`, `TimestampSeedsSupplier` — CJS interop exports.
 - `BaseRenchanModel`, `RenchanModel`, `FertileForestModel` — the model base-class hierarchy.
@@ -288,8 +288,10 @@ CommonJS (`.cjs`); the migration-file counterpart of `ModelAttributeFactory` (in
 
 CommonJS (`.cjs`); fills in `created_at`/`updated_at` for Sequelize CLI seed files.
 
-- `.supplyAll(seeds)` — static method. `seeds.map(it => this.supplyOne(it))`.
-- `.supplyOne(seed)` — static method. `{ created_at: now, updated_at: now, ...seed }` — an explicit value in `seed` wins over the auto-generated timestamp. `deleted_at` is intentionally not supplied (defaults to `null`).
+- `.create({ now = new Date() } = {})` — static factory method. The instance keeps `now`, so every seed it supplies carries the same timestamp.
+- `.supplyAll(seeds, now = new Date())` — static method. `seeds.map(it => this.supplyOne(it, now))`, so one call stamps every seed with the same `now`.
+- `.supplyOne(seed, now = new Date())` — static method. `{ created_at: now, updated_at: now, ...seed }` — an explicit value in `seed` wins over the supplied timestamp. `deleted_at` is intentionally not supplied (defaults to `null`).
+- `#supplyAll(seeds)` / `#supplyOne(seed)` — instance methods. Call the static method of the same name with the instance's `now`.
 
 ### Class: `RootPath`
 
@@ -320,6 +322,8 @@ A test-support utility: builds a `RegExp` from a nested array-of-string SQL temp
 Recursively strips `undefined` values out of a Sequelize `where`-clause-shaped object/array, so callers can build `where` clauses with optional keys without leaving stray `undefined`s for Sequelize to choke on.
 
 - `.create({ extractorHash = {} } = {})` — static factory method. `extractorHash` maps a `Symbol` key (typically a `Sequelize.Op`) to a custom extractor function; defaults already handle `Op.between`/`Op.notBetween` (requires an array of length >= 2).
+- `#defaultExtractorHash()` — instance method. The built-in `Op.between`/`Op.notBetween` filters.
+- `#buildExtractorHash()` — instance method. `{ ...this.defaultExtractorHash(), ...this.extractorHash }`, so a custom extractor replaces the default under the same key. The instance stores only the custom `extractorHash`.
 - `#extract(target)` — instance method. Returns `target` as-is for non-plain-object/array values; otherwise recurses through arrays/objects (including `Symbol` keys), dropping any key/element whose extracted value is `undefined`, and returns `undefined` itself if nothing remains.
 
 ## Usage
